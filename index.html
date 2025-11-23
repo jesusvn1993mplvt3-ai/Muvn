@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -36,6 +35,11 @@
         .animate-fade-in {
             animation: fadeIn 0.5s ease-out forwards;
         }
+        /* Estilo para asegurar la firma de la fecha (DD/MM/YYYY) */
+        .dob-input {
+            letter-spacing: 2px;
+            font-family: monospace;
+        }
     </style>
 </head>
 <body class="bg-blue-50 text-gray-800 font-sans pb-24">
@@ -58,6 +62,7 @@
             ClipboardList: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M12 11h4"/><path d="M12 16h4"/><path d="M8 11h.01"/><path d="M8 16h.01"/></svg>,
             Heart: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>,
             Lock: () => <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>,
+            Unlock: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 8.355-3.791"/><path d="m15 7-1-1"/></svg>,
             Edit: () => <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>
         };
 
@@ -65,12 +70,16 @@
             "Ana Martínez", "Carlos Velázquez", "Beatriz Solís", "David López", "Elena Ramírez"
         ];
 
-        // --- BASE DE DATOS DE PACIENTES (8 Pacientes) ---
-        const PATIENTS = [
+        // --- BASE DE DATOS DE PACIENTES (Incluyendo datos de seguridad y asignación) ---
+        // DD/MM/YYYY es el formato de la fecha de nacimiento (dob)
+        const PATIENTS_DB = [
             {
                 id: 'p1',
                 name: "Don Roberto (Diabetes/Hipertensión)",
                 details: "Insulinodependiente. Riesgo hipoglucemia.",
+                caregiverId: "Ana Martínez",
+                dob: "15/07/1945", 
+                petName: "Max",
                 tasks: {
                     dia: [
                         { id: 't1_d1', text: "Toma de Glucosa (Ayunas)", type: "vital" },
@@ -91,6 +100,9 @@
                 id: 'p2',
                 name: "Doña María (Alzheimer)",
                 details: "Desorientación espacial. No dejar sola.",
+                caregiverId: "Ana Martínez",
+                dob: "20/11/1939",
+                petName: "Luna",
                 tasks: {
                     dia: [
                         { id: 'p2_d1', text: "Memantina 10mg", type: "med" },
@@ -110,6 +122,9 @@
                 id: 'p3',
                 name: "Sr. Pedro (Post-Op Cadera)",
                 details: "Movilidad reducida. Riesgo de escaras.",
+                caregiverId: "Carlos Velázquez",
+                dob: "03/04/1958",
+                petName: "Bobby",
                 tasks: {
                     dia: [
                         { id: 'p3_d1', text: "Curación herida", type: "nursing" },
@@ -129,6 +144,9 @@
                 id: 'p4',
                 name: "Sra. Carmen (Parkinson)",
                 details: "Temblores marcados. Riesgo atragantamiento.",
+                caregiverId: "Carlos Velázquez",
+                dob: "01/01/1940",
+                petName: "Mochi",
                 tasks: {
                     dia: [
                         { id: 'p4_d1', text: "Levodopa (Estricto horario)", type: "med", note: "30 min antes de comida" },
@@ -146,6 +164,9 @@
                 id: 'p5',
                 name: "Don Luis (EPOC / Oxígeno)",
                 details: "Usa oxígeno 24h. Fatiga crónica.",
+                caregiverId: "Beatriz Solís",
+                dob: "10/05/1962",
+                petName: "Kiko",
                 tasks: {
                     dia: [
                         { id: 'p5_d1', text: "Nebulización matutina", type: "nursing" },
@@ -164,6 +185,9 @@
                 id: 'p6',
                 name: "Sra. Rosa (Artritis Reumatoide)",
                 details: "Dolor articular severo en mañanas.",
+                caregiverId: "Beatriz Solís",
+                dob: "25/08/1950",
+                petName: "Nala",
                 tasks: {
                     dia: [
                         { id: 'p6_d1', text: "Compresas calientes manos", type: "nursing" },
@@ -180,6 +204,9 @@
                 id: 'p7',
                 name: "Don Miguel (Recuperación Ictus)",
                 details: "Hemiparesia derecha. Dificultad habla.",
+                caregiverId: "David López",
+                dob: "12/12/1970",
+                petName: "Pelusa",
                 tasks: {
                     dia: [
                         { id: 'p7_d1', text: "Anticoagulante", type: "med" },
@@ -196,6 +223,9 @@
                 id: 'p8',
                 name: "Sra. Elena (Depresión/Ansiedad)",
                 details: "Vigilar estado de ánimo. Compañía.",
+                caregiverId: "David López",
+                dob: "29/02/1948",
+                petName: "Coco",
                 tasks: {
                     dia: [
                         { id: 'p8_d1', text: "Antidepresivo", type: "med" },
@@ -211,34 +241,80 @@
         ];
 
         function App() {
+            // Estado de la Sesión
             const [caregiver, setCaregiver] = React.useState("");
             const [shift, setShift] = React.useState("");
+            
+            // Estado de Verificación
+            const [isVerified, setIsVerified] = React.useState(false);
+            const [dobInput, setDobInput] = React.useState(""); // Fecha de Nacimiento (DD/MM/YYYY)
+            const [petNameInput, setPetNameInput] = React.useState(""); // Nombre de Mascota
+            const [verificationError, setVerificationError] = React.useState("");
+
+            // Estado de Paciente y Registros
             const [patientId, setPatientId] = React.useState("");
-            // Estado temporal para el selector antes de confirmar
             const [tempPatientId, setTempPatientId] = React.useState(""); 
             const [records, setRecords] = React.useState({});
 
+            // Cargar estado desde localStorage al inicio
             React.useEffect(() => {
-                const saved = localStorage.getItem('careApp_data_v2');
+                const saved = localStorage.getItem('careApp_data_v3');
                 if (saved) {
                     const parsed = JSON.parse(saved);
                     setCaregiver(parsed.caregiver || "");
                     setShift(parsed.shift || "");
+                    setIsVerified(parsed.isVerified || false);
                     setPatientId(parsed.patientId || "");
-                    // Si ya había paciente seleccionado, lo ponemos en el temporal también
                     if (parsed.patientId) setTempPatientId(parsed.patientId);
                     setRecords(parsed.records || {});
                 }
             }, []);
 
+            // Guardar estado en localStorage con cada cambio relevante
             React.useEffect(() => {
-                const dataToSave = { caregiver, shift, patientId, records };
-                localStorage.setItem('careApp_data_v2', JSON.stringify(dataToSave));
-            }, [caregiver, shift, patientId, records]);
+                const dataToSave = { caregiver, shift, isVerified, patientId, records };
+                localStorage.setItem('careApp_data_v3', JSON.stringify(dataToSave));
+            }, [caregiver, shift, isVerified, patientId, records]);
+
+            // --- LÓGICA DE VERIFICACIÓN ---
+
+            // Obtener lista de pacientes asignados al cuidador actual
+            const assignedPatients = PATIENTS_DB.filter(p => p.caregiverId === caregiver);
+            
+            // Obtener lista única de mascotas para el menú desplegable de verificación
+            const uniquePetNames = [...new Set(assignedPatients.map(p => p.petName))];
+
+            const handleVerification = () => {
+                setVerificationError("");
+
+                if (!caregiver || !dobInput || !petNameInput) {
+                    setVerificationError("Por favor, completa todos los campos de seguridad.");
+                    return;
+                }
+
+                // Normalizar la fecha de nacimiento a DD/MM/YYYY (quitar espacios si los hubiera)
+                const normalizedDob = dobInput.trim().replace(/\s/g, '');
+                
+                // Buscar si existe AL MENOS UN paciente asignado que coincida con la tripleta (Cuidador, DOB, Mascota)
+                const matchFound = assignedPatients.some(p => 
+                    p.dob === normalizedDob && 
+                    p.petName === petNameInput
+                );
+
+                if (matchFound) {
+                    setIsVerified(true);
+                    setVerificationError("");
+                } else {
+                    setIsVerified(false);
+                    setVerificationError("Error de verificación. Los datos no coinciden con la asignación.");
+                }
+            };
+            
+            // --- LÓGICA DE TAREAS Y REPORTES ---
 
             const handleTaskCheck = (taskId) => {
                 const now = new Date();
-                const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
+                const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false }); // 24h format for simplicity
                 const dateString = now.toLocaleDateString([], {day: 'numeric', month: 'short'});
 
                 setRecords(prev => {
@@ -262,12 +338,24 @@
                 if(window.confirm("¿Estás seguro de borrar todos los datos y reiniciar?")) {
                     setCaregiver("");
                     setShift("");
+                    setIsVerified(false);
+                    setDobInput("");
+                    setPetNameInput("");
                     setPatientId("");
                     setTempPatientId("");
                     setRecords({});
-                    localStorage.removeItem('careApp_data_v2');
+                    localStorage.removeItem('careApp_data_v3');
                 }
             };
+            
+            // Reiniciar verificación y paciente si cambia el cuidador
+            React.useEffect(() => {
+                setIsVerified(false);
+                setPatientId("");
+                setTempPatientId("");
+                setDobInput("");
+                setPetNameInput("");
+            }, [caregiver]);
 
             const confirmPatientSelection = () => {
                 if (!tempPatientId) return;
@@ -279,14 +367,20 @@
                     setPatientId("");
                 }
             };
+            
+            const clearVerification = () => {
+                setIsVerified(false);
+                setPatientId("");
+            };
 
             const generateWhatsAppLink = () => {
                 if (!caregiver || !shift || !patientId) {
-                    alert("Faltan datos para generar el reporte.");
+                    // Usar un modal simple en lugar de alert
+                    console.error("Faltan datos para generar el reporte.");
                     return;
                 }
 
-                const patient = PATIENTS.find(p => p.id === patientId);
+                const patient = PATIENTS_DB.find(p => p.id === patientId);
                 const taskList = patient.tasks[shift] || [];
                 
                 let message = `📋 *REPORTE MUVN*\n`;
@@ -302,7 +396,7 @@
                     if (rec && rec.checked) {
                         completedCount++;
                         message += `🔹 ${task.text} (${rec.time})\n`;
-                        if (rec.note) message += `   📝 ${rec.note}\n`;
+                        if (rec.note) message += `   📝 Obs: ${rec.note}\n`;
                     }
                 });
 
@@ -313,16 +407,16 @@
                     const rec = records[task.id];
                     if (!rec || !rec.checked) {
                         message += `🔸 ${task.text}`;
-                        if (rec && rec.note) message += ` - ${rec.note}`;
+                        if (rec && rec.note) message += ` - Obs: ${rec.note}`;
                         message += `\n`;
                     }
                 });
 
                 const encodedMsg = encodeURIComponent(message);
-                window.open(`https://wa.me/524451586270?text=${encodedMsg}`, '_blank');
+                window.open(`https://wa.me/?text=${encodedMsg}`, '_blank');
             };
 
-            const currentPatient = PATIENTS.find(p => p.id === patientId);
+            const currentPatient = PATIENTS_DB.find(p => p.id === patientId);
             const currentTasks = (currentPatient && shift) ? currentPatient.tasks[shift] : [];
 
             return (
@@ -337,7 +431,7 @@
                                 </h1>
                                 <p className="text-xs text-sky-100 font-medium">Registro de Cuidados</p>
                             </div>
-                            <button onClick={resetAll} className="bg-rose-500 hover:bg-rose-600 text-white p-2 rounded-lg text-xs flex items-center gap-1 shadow-sm">
+                            <button onClick={resetAll} className="bg-rose-500 hover:bg-rose-600 text-white p-2 rounded-lg text-xs flex items-center gap-1 shadow-sm transition-all">
                                 <Icons.Trash2 /> Reiniciar
                             </button>
                         </div>
@@ -363,84 +457,160 @@
                                 value={caregiver} 
                                 onChange={(e) => setCaregiver(e.target.value)}
                                 className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-lg focus:ring-2 focus:ring-sky-500 outline-none"
+                                disabled={isVerified}
                             >
                                 <option value="">-- Elige tu nombre --</option>
                                 {CAREGIVERS.map(c => <option key={c} value={c}>{c}</option>)}
                             </select>
                         </section>
 
-                        {/* 2. SELECCIÓN DE TURNO */}
-                        <section className="grid grid-cols-2 gap-4">
-                            <button 
-                                onClick={() => setShift('dia')}
-                                className={`p-4 rounded-xl border-2 flex flex-col items-center justify-center gap-2 transition-all ${shift === 'dia' ? 'border-amber-400 bg-amber-50 text-amber-700' : 'border-gray-200 bg-white text-gray-400'}`}
-                            >
-                                <div className={shift === 'dia' ? 'text-amber-500' : ''}><Icons.Sun /></div>
-                                <span className="font-bold">Turno Día</span>
-                            </button>
-                            <button 
-                                onClick={() => setShift('noche')}
-                                className={`p-4 rounded-xl border-2 flex flex-col items-center justify-center gap-2 transition-all ${shift === 'noche' ? 'border-indigo-500 bg-indigo-50 text-indigo-700' : 'border-gray-200 bg-white text-gray-400'}`}
-                            >
-                                <div className={shift === 'noche' ? 'text-indigo-600' : ''}><Icons.Moon /></div>
-                                <span className="font-bold">Turno Noche</span>
-                            </button>
-                        </section>
+                        {/* 2. VERIFICACIÓN DE ACCESO */}
+                        {caregiver && !isVerified && (
+                            <section className="bg-red-50 p-4 rounded-xl shadow-md border border-red-200 animate-fade-in">
+                                <h2 className="text-base font-bold text-red-700 mb-3 flex items-center gap-2">
+                                    <Icons.Lock /> Verificación de Acceso
+                                </h2>
+                                <p className="text-sm text-red-600 mb-4">
+                                    Ingresa un dato de seguridad de *uno* de tus pacientes asignados para desbloquear la lista.
+                                </p>
 
-                        {/* 3. SELECCIÓN DE PACIENTE (CON CONFIRMACIÓN) */}
-                        <section className="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
-                           <label className="block text-sm font-semibold text-gray-600 mb-2 flex items-center gap-2">
-                                <Icons.ClipboardList />
-                                Paciente
-                            </label>
-
-                            {!patientId ? (
-                                // ESTADO: SIN CONFIRMAR (Menú Desplegable)
-                                <div className="space-y-3 animate-fade-in">
-                                    <select 
-                                        value={tempPatientId}
-                                        onChange={(e) => setTempPatientId(e.target.value)}
-                                        className="w-full p-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-800 text-lg focus:ring-2 focus:ring-sky-500 outline-none"
-                                    >
-                                        <option value="">-- Selecciona un Paciente --</option>
-                                        {PATIENTS.map(p => (
-                                            <option key={p.id} value={p.id}>{p.name}</option>
-                                        ))}
-                                    </select>
-                                    
-                                    <button 
-                                        onClick={confirmPatientSelection}
-                                        disabled={!tempPatientId}
-                                        className={`w-full py-3 rounded-lg font-bold flex items-center justify-center gap-2 transition-all ${tempPatientId ? 'bg-sky-600 text-white shadow-md hover:bg-sky-700' : 'bg-gray-200 text-gray-400 cursor-not-allowed'}`}
-                                    >
-                                        <Icons.CheckCircle className="w-5 h-5" />
-                                        Confirmar Paciente
-                                    </button>
-                                </div>
-                            ) : (
-                                // ESTADO: CONFIRMADO (Tarjeta Bloqueada)
-                                <div className="animate-fade-in bg-sky-50 border border-sky-200 rounded-lg p-4 flex justify-between items-center">
+                                <div className="space-y-4">
+                                    {/* Campo Fecha de Nacimiento */}
                                     <div>
-                                        <div className="flex items-center gap-2 text-sky-800 font-bold text-lg">
-                                            {PATIENTS.find(p => p.id === patientId).name}
-                                            <Icons.Lock />
-                                        </div>
-                                        <p className="text-sm text-sky-600 mt-1">
-                                            {PATIENTS.find(p => p.id === patientId).details}
-                                        </p>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                                            Fecha de Nacimiento del paciente (DD/MM/YYYY)
+                                        </label>
+                                        <input
+                                            type="text"
+                                            placeholder="Ej: 15/07/1945"
+                                            value={dobInput}
+                                            onChange={(e) => setDobInput(e.target.value)}
+                                            className="w-full p-3 bg-white border border-gray-300 rounded-lg text-lg dob-input focus:ring-2 focus:ring-red-500 outline-none"
+                                            maxLength={10}
+                                        />
                                     </div>
+
+                                    {/* Campo Nombre de Mascota */}
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                                            Nombre de Mascota (De un paciente asignado)
+                                        </label>
+                                        <select 
+                                            value={petNameInput}
+                                            onChange={(e) => setPetNameInput(e.target.value)}
+                                            className="w-full p-3 bg-white border border-gray-300 rounded-lg text-lg focus:ring-2 focus:ring-red-500 outline-none"
+                                        >
+                                            <option value="">-- Elige una mascota --</option>
+                                            {uniquePetNames.map(pName => (
+                                                <option key={pName} value={pName}>{pName}</option>
+                                            ))}
+                                            {uniquePetNames.length === 0 && <option disabled>Sin mascotas asignadas</option>}
+                                        </select>
+                                    </div>
+                                    
+                                    {verificationError && (
+                                        <div className="text-sm text-red-700 bg-red-100 p-2 rounded-lg font-medium">
+                                            {verificationError}
+                                        </div>
+                                    )}
+
                                     <button 
-                                        onClick={changePatient}
-                                        className="text-xs text-gray-500 hover:text-sky-600 underline flex items-center gap-1 ml-4"
+                                        onClick={handleVerification}
+                                        disabled={!dobInput || !petNameInput || uniquePetNames.length === 0}
+                                        className={`w-full py-3 rounded-lg font-bold flex items-center justify-center gap-2 transition-all ${dobInput && petNameInput ? 'bg-red-600 text-white shadow-md hover:bg-red-700' : 'bg-gray-200 text-gray-400 cursor-not-allowed'}`}
                                     >
-                                        <Icons.Edit /> Cambiar
+                                        <Icons.Unlock className="w-5 h-5" />
+                                        Desbloquear Pacientes
                                     </button>
                                 </div>
-                            )}
-                        </section>
+                            </section>
+                        )}
 
-                        {/* 4. LISTA DE TAREAS */}
-                        {caregiver && shift && patientId && (
+
+                        {/* 3. SELECCIÓN DE PACIENTE (FILTRADO Y CONFIRMACIÓN) */}
+                        {caregiver && isVerified && (
+                            <section className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 animate-fade-in">
+                                <label className="block text-sm font-semibold text-gray-600 mb-2 flex items-center gap-2">
+                                        <Icons.ClipboardList />
+                                        Selecciona Paciente Asignado ({assignedPatients.length})
+                                </label>
+
+                                {!patientId ? (
+                                    // ESTADO: SIN CONFIRMAR (Menú Desplegable FILTRADO)
+                                    <div className="space-y-3">
+                                        <select 
+                                            value={tempPatientId}
+                                            onChange={(e) => setTempPatientId(e.target.value)}
+                                            className="w-full p-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-800 text-lg focus:ring-2 focus:ring-sky-500 outline-none"
+                                        >
+                                            <option value="">-- Elige el paciente a registrar --</option>
+                                            {assignedPatients.map(p => (
+                                                <option key={p.id} value={p.id}>{p.name}</option>
+                                            ))}
+                                        </select>
+                                        
+                                        <button 
+                                            onClick={confirmPatientSelection}
+                                            disabled={!tempPatientId}
+                                            className={`w-full py-3 rounded-lg font-bold flex items-center justify-center gap-2 transition-all ${tempPatientId ? 'bg-sky-600 text-white shadow-md hover:bg-sky-700' : 'bg-gray-200 text-gray-400 cursor-not-allowed'}`}
+                                        >
+                                            <Icons.CheckCircle className="w-5 h-5" />
+                                            Confirmar Paciente
+                                        </button>
+                                        <button 
+                                            onClick={clearVerification}
+                                            className="w-full text-sm text-red-500 hover:text-red-700 underline pt-2"
+                                        >
+                                            Cambiar datos de verificación
+                                        </button>
+                                    </div>
+                                ) : (
+                                    // ESTADO: CONFIRMADO (Tarjeta Bloqueada)
+                                    <div className="bg-sky-50 border border-sky-200 rounded-lg p-4 flex justify-between items-center">
+                                        <div>
+                                            <div className="flex items-center gap-2 text-sky-800 font-bold text-lg">
+                                                {PATIENTS_DB.find(p => p.id === patientId).name}
+                                                <Icons.Lock />
+                                            </div>
+                                            <p className="text-sm text-sky-600 mt-1">
+                                                {PATIENTS_DB.find(p => p.id === patientId).details}
+                                            </p>
+                                        </div>
+                                        <button 
+                                            onClick={changePatient}
+                                            className="text-xs text-gray-500 hover:text-sky-600 underline flex items-center gap-1 ml-4"
+                                        >
+                                            <Icons.Edit /> Cambiar
+                                        </button>
+                                    </div>
+                                )}
+                            </section>
+                        )}
+
+
+                        {/* 4. SELECCIÓN DE TURNO (Solo si está verificado) */}
+                        {isVerified && (
+                            <section className="grid grid-cols-2 gap-4 animate-fade-in">
+                                <button 
+                                    onClick={() => setShift('dia')}
+                                    className={`p-4 rounded-xl border-2 flex flex-col items-center justify-center gap-2 transition-all ${shift === 'dia' ? 'border-amber-400 bg-amber-50 text-amber-700' : 'border-gray-200 bg-white text-gray-400'}`}
+                                >
+                                    <div className={shift === 'dia' ? 'text-amber-500' : ''}><Icons.Sun /></div>
+                                    <span className="font-bold">Turno Día</span>
+                                </button>
+                                <button 
+                                    onClick={() => setShift('noche')}
+                                    className={`p-4 rounded-xl border-2 flex flex-col items-center justify-center gap-2 transition-all ${shift === 'noche' ? 'border-indigo-500 bg-indigo-50 text-indigo-700' : 'border-gray-200 bg-white text-gray-400'}`}
+                                >
+                                    <div className={shift === 'noche' ? 'text-indigo-600' : ''}><Icons.Moon /></div>
+                                    <span className="font-bold">Turno Noche</span>
+                                </button>
+                            </section>
+                        )}
+
+
+                        {/* 5. LISTA DE TAREAS */}
+                        {caregiver && isVerified && shift && patientId && (
                             <section className="space-y-4 animate-fade-in">
                                 <div className="flex items-center gap-2 mb-2">
                                     <h2 className="text-lg font-bold text-gray-800">
@@ -510,7 +680,7 @@
                     </main>
 
                     {/* FOOTER */}
-                    {caregiver && shift && patientId && (
+                    {caregiver && isVerified && shift && patientId && (
                         <div className="fixed bottom-0 left-0 w-full bg-white border-t border-gray-200 p-4 shadow-lg z-20">
                             <div className="max-w-3xl mx-auto">
                                 <button
@@ -532,5 +702,4 @@
     </script>
 </body>
 </html>
-
 
