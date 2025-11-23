@@ -3,17 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MUVN - Acceso de Doble Factor</title>
     
-    <!-- Metadatos -->
-    <meta property="og:title" content="MUVN - Equipo de Cuidados">
-    <meta property="og:image" content="https://raw.githubusercontent.com/jesusvn1993mplvt3-ai/proyecto_cuidadores_MUVN/refs/heads/main/MUVN.jpg">
+    <!-- --- CONFIGURACIĂ“N PARA WHATSAPP / REDES SOCIALES --- -->
+    <title>MUVN - Registro de Cuidados</title>
+    <meta name="description" content="Herramienta exclusiva para el equipo de cuidadores.">
 
+    <!-- Open Graph (Lo que ve WhatsApp/Facebook) -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="MUVN - Equipo de Cuidados">
+    <meta property="og:description" content="Cuidar con el corazĂłn hace la diferencia. âť¤ď¸Ź Gracias por tu dedicaciĂłn diaria.">
+    <meta property="og:image" content="https://raw.githubusercontent.com/jesusvn1993mplvt3-ai/proyecto_cuidadores_MUVN/refs/heads/main/MUVN.jpg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+
+    <!-- Twitter Card (Opcional, para mejor compatibilidad) -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="MUVN - Equipo de Cuidados">
+    <meta name="twitter:description" content="Cuidar con el corazĂłn hace la diferencia. âť¤ď¸Ź Gracias por tu dedicaciĂłn diaria.">
+    <meta name="twitter:image" content="https://raw.githubusercontent.com/jesusvn1993mplvt3-ai/proyecto_cuidadores_MUVN/refs/heads/main/MUVN.jpg">
+    
+    <!-- --- LIBRERĂŤAS (NO TOCAR) --- -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+
+    <style>
+        /* Animaciones suaves */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+    </style>
 </head>
-<body class="bg-slate-900 text-gray-100 font-sans pb-24 selection:bg-cyan-500 selection:text-white">
+<body class="bg-blue-50 text-gray-800 font-sans pb-20">
 
     <div id="root"></div>
 
+    <!-- --- CĂ“DIGO DE LA APP --- -->
     <script type="text/babel">
 
         // --- ICONOS ---
@@ -28,516 +58,351 @@
             Activity: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>,
             AlertCircle: () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>,
             ClipboardList: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M12 11h4"/><path d="M12 16h4"/><path d="M8 11h.01"/><path d="M8 16h.01"/></svg>,
-            Lock: () => <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>,
-            Edit: () => <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>,
-            Camera: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>,
-            X: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>,
-            Brain: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96.44 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 1.98-3A2.5 2.5 0 0 1 9.5 2Z"/><path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96.44 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-1.98-3A2.5 2.5 0 0 0 14.5 2Z"/></svg>,
-            ShieldCheck: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>,
-            ShieldAlert: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>,
-            Calendar: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>,
-            Paw: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="4" r="2"/><circle cx="18" cy="8" r="2"/><circle cx="6" cy="10" r="2"/><path d="M10 20.2c.4-.4.8-1 1.2-1.7s.9-1.3 1.5-1.9c.7-.5 1.7-1 3.3-1.4 1.7-.4 3.6-1 5.3-2.1"/><path d="M16 16s-1.5-1-2-1.5c-.7-.7-1.4-1.2-1.8-1.5s-.8-1-1.3-1.8c-.8-1.2-1-2.4-1.1-2.9"/><path d="M15 21s-2-1.5-2.5-2c-.5-.5-1-1.2-1-1.8s-.5-1-1-1.5c-.8-1.3-1-2.5-1.1-3.2"/></svg>
+            Heart: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
         };
 
-        // --- DATA DE CUIDADORES Y PACIENTES (SEGURO) ---
-        // Ahora cada cuidador tiene asignado:
-        // 1. Un paciente único (patientId)
-        // 2. Un DOB (Date of Birth) como factor de seguridad
-        // 3. Un Pet Name (Mascota) como factor de seguridad
-        const CAREGIVER_DATA = [
-            { name: "Ana Martínez", patientId: "p1", dob: "1990-05-15", pet: "Luna" },
-            { name: "Carlos Velázquez", patientId: "p2", dob: "1985-11-20", pet: "Rocky" },
-            { name: "Beatriz Solís", patientId: "p3", dob: "2000-01-01", pet: "Toby" },
-            { name: "David López", patientId: "p4", dob: "1978-08-25", pet: "Milo" },
-            { name: "Elena Ramírez", patientId: "p5", dob: "1995-03-10", pet: "Mia" }
+        // --- DATOS DE EJEMPLO ---
+        const CAREGIVERS = [
+            "Ana MartĂ­nez", "Carlos VelĂˇzquez", "Beatriz SolĂ­s", "David LĂłpez", "Elena RamĂ­rez"
         ];
 
         const PATIENTS = [
-            { id: 'p1', name: "Don Roberto", details: "Diabetes/Hipertensión", tasks: { dia: [{ id: 't1_d1', text: "Toma de Glucosa", type: "vital" }, { id: 't1_d2', text: "Insulina NPH 15uds", type: "med" }, { id: 't1_d5', text: "Metformina 850mg", type: "med" }], noche: [{ id: 't1_n1', text: "Cena ligera", type: "food" }, { id: 't1_n2', text: "Revisión pañal", type: "check" }, { id: 't1_n3', text: "Insulina Nocturna", type: "med" }] } },
-            { id: 'p2', name: "Doña María", details: "Alzheimer", tasks: { dia: [{ id: 'p2_d1', text: "Memantina 10mg", type: "med" }, { id: 'p2_d3', text: "Ejercicios cognitivos", type: "activity" }], noche: [{ id: 'p2_n1', text: "Quetiapina", type: "med" }, { id: 'p2_n2', text: "Subir barandales", type: "safety" }, { id: 'p2_n4', text: "Cambio pañal (Nota: Siempre verificar incontinencia)", type: "hygiene" }] } },
-            { id: 'p3', name: "Sr. Pedro", details: "Post-Op Cadera (Detalles sensibles)", tasks: { dia: [{ id: 'p3_d1', text: "Curación herida", type: "nursing" }, { id: 'p3_d4', text: "Cambio postura (3h)", type: "check" }], noche: [{ id: 'p3_n1', text: "Analgésico", type: "med" }, { id: 'p3_n2', text: "Postura Izquierda (Nota: No presionar cicatriz)", type: "check" }, { id: 'p3_n3', text: "Postura Arriba", type: "check" }] } },
-            { id: 'p4', name: "Sra. Carmen", details: "Parkinson", tasks: { dia: [{ id: 'p4_d1', text: "Levodopa (30min antes)", type: "med" }, { id: 'p4_d2', text: "Ayuda comida", type: "food" }], noche: [{ id: 'p4_n1', text: "Meds Nocturnos", type: "med" }, { id: 'p4_n3', text: "Almohadas", type: "check" }] } },
-            { id: 'p5', name: "Don Luis", details: "EPOC / Oxígeno", tasks: { dia: [{ id: 'p5_d1', text: "Nebulización", type: "nursing" }, { id: 'p5_d2', text: "Revisar O2", type: "env" }], noche: [{ id: 'p5_n1', text: "Conectar CPAP", type: "nursing" }, { id: 'p5_n2', text: "Oximetría", type: "vital" }] } },
+            {
+                id: 'p1',
+                name: "Don Roberto (Diabetes/HipertensiĂłn)",
+                details: "Insulinodependiente. Riesgo de hipoglucemia nocturna.",
+                tasks: {
+                dia: [
+                    { id: 't1_d1', text: "Toma de Glucosa (Ayunas)", type: "vital" },
+                    { id: 't1_d2', text: "Administrar Insulina (NPH 15 uds)", type: "med" },
+                    { id: 't1_d3', text: "Desayuno (Dieta baja en azĂşcar)", type: "food" },
+                    { id: 't1_d4', text: "Toma de PresiĂłn Arterial", type: "vital" },
+                    { id: 't1_d5', text: "Administrar Metformina 850mg", type: "med" }
+                ],
+                noche: [
+                    { id: 't1_n1', text: "Cena ligera (7:00 PM)", type: "food" },
+                    { id: 't1_n2', text: "RevisiĂłn de paĂ±al (Incontinencia leve)", type: "check", note: "Asegurar que estĂ© seco antes de dormir." },
+                    { id: 't1_n3', text: "Administrar Insulina Nocturna", type: "med" },
+                    { id: 't1_n4', text: "Revisar temperatura habitaciĂłn (FrĂ­o)", type: "env", note: "Si hace frĂ­o, agregar manta extra. Despertar a las 3 AM para baĂ±o." }
+                ]
+                }
+            },
+            {
+                id: 'p2',
+                name: "DoĂ±a MarĂ­a (Alzheimer)",
+                details: "DesorientaciĂłn espacial. No dejar sola.",
+                tasks: {
+                dia: [
+                    { id: 'p2_d1', text: "Administrar Memantina 10mg", type: "med" },
+                    { id: 'p2_d2', text: "Aseo personal asistido", type: "hygiene" },
+                    { id: 'p2_d3', text: "Ejercicios cognitivos (Memoria)", type: "activity" },
+                    { id: 'p2_d4', text: "HidrataciĂłn (Vaso de agua)", type: "food" }
+                ],
+                noche: [
+                    { id: 'p2_n1', text: "Administrar Quetiapina (Si estĂˇ agitada)", type: "med" },
+                    { id: 'p2_n2', text: "Subir barandales de la cama", type: "safety", note: "Riesgo de caĂ­das al intentar levantarse." },
+                    { id: 'p2_n3', text: "RevisiĂłn de sueĂ±o cada 2 horas", type: "check" },
+                    { id: 'p2_n4', text: "RevisiĂłn de paĂ±al (Cambio nocturno)", type: "hygiene", note: "Piel muy sensible, usar crema protectora." }
+                ]
+                }
+            },
+            {
+                id: 'p3',
+                name: "Sr. Pedro (Post-operatorio Cadera)",
+                details: "Movilidad reducida. Riesgo de escaras.",
+                tasks: {
+                dia: [
+                    { id: 'p3_d1', text: "CuraciĂłn de herida quirĂşrgica", type: "nursing" },
+                    { id: 'p3_d2', text: "AnalgĂ©sico (Tramadol)", type: "med" },
+                    { id: 'p3_d3', text: "Terapia fĂ­sica (Movimiento suave)", type: "activity" },
+                    { id: 'p3_d4', text: "Cambio de posiciĂłn (Cada 3 horas)", type: "check" }
+                ],
+                noche: [
+                    { id: 'p3_n1', text: "AnalgĂ©sico Nocturno", type: "med" },
+                    { id: 'p3_n2', text: "Cambio de posiciĂłn (Lado Izquierdo)", type: "check" },
+                    { id: 'p3_n3', text: "Cambio de posiciĂłn (Boca arriba)", type: "check" },
+                    { id: 'p3_n4', text: "Revisar orina en bolsa recolectora", type: "check" }
+                ]
+                }
+            }
         ];
 
-
-        // --- COMPONENTE DE SEGURIDAD BIOMÉTRICA (CEREBRO) ---
-        // Simplificado para solo detectar y auto-aprobar
-        const BiometricScanner = ({ onAuthSuccess, onCancel, userName }) => {
-            const videoRef = React.useRef(null);
-            const canvasRef = React.useRef(null);
-            
-            const [status, setStatus] = React.useState("Cargando Modelos Neuronales...");
-            const [isReady, setIsReady] = React.useState(false);
-            const [matchResult, setMatchResult] = React.useState(null); 
-
-            React.useEffect(() => {
-                loadModels();
-            }, []);
-
-            const loadModels = async () => {
-                const MODEL_URL = 'https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model/';
-                try {
-                    await Promise.all([
-                        faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL),
-                        faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL),
-                        faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL)
-                    ]);
-                    setStatus("Iniciando Óptica...");
-                    startCamera();
-                } catch (err) {
-                    setStatus("Error en Sistema IA");
-                }
-            };
-
-            const startCamera = async () => {
-                try {
-                    // Pedir la cámara frontal
-                    const stream = await navigator.mediaDevices.getUserMedia({ 
-                        video: {
-                            facingMode: "user"
-                        } 
-                    });
-                    if (videoRef.current) videoRef.current.srcObject = stream;
-                } catch (err) {
-                    setStatus("Cámara bloqueada o no disponible.");
-                }
-            };
-
-            const handleVideoPlay = () => {
-                setStatus("BUSCANDO ROSTRO...");
-                setIsReady(true);
-                
-                // Intervalo de escaneo
-                const interval = setInterval(async () => {
-                    if (!videoRef.current || !canvasRef.current) return;
-
-                    // 1. Detectar cara y calcular descriptor (vector numérico único de la cara)
-                    const detection = await faceapi.detectSingleFace(
-                        videoRef.current, 
-                        new faceapi.TinyFaceDetectorOptions()
-                    ).withFaceLandmarks().withFaceDescriptor();
-
-                    if (detection) {
-                        const dims = faceapi.matchDimensions(canvasRef.current, videoRef.current);
-                        const resized = faceapi.resizeResults(detection, dims);
-                        
-                        // Dibujar cuadro para indicar detección
-                        faceapi.draw.drawDetections(canvasRef.current, resized);
-
-                        // Auto-aprobar una vez detectado un rostro (Modo de Seguridad Suave)
-                        setMatchResult('match');
-                        setStatus("ROSTRO DETECTADO. Capturando...");
-                        clearInterval(interval);
-                        captureAndClose(detection.descriptor);
-                        
-                    } else {
-                        setStatus("Asegúrate de que tu rostro esté en el centro.");
-                        setMatchResult(null);
-                        const ctx = canvasRef.current.getContext('2d');
-                        ctx.clearRect(0,0, canvasRef.current.width, canvasRef.current.height);
-                    }
-                }, 500); // Revisar cada 500ms
-                
-                return () => clearInterval(interval);
-            };
-
-            const captureAndClose = (descriptor) => {
-                // Capturar foto visual
-                const canvas = document.createElement('canvas');
-                canvas.width = videoRef.current.videoWidth;
-                canvas.height = videoRef.current.videoHeight;
-                canvas.getContext('2d').drawImage(videoRef.current, 0, 0);
-                const photoData = canvas.toDataURL('image/jpeg', 0.8);
-                
-                // Detener cámara
-                const stream = videoRef.current.srcObject;
-                stream.getTracks().forEach(t => t.stop());
-
-                // Retornar datos (Foto + Vector Biométrico)
-                onAuthSuccess(photoData, descriptor);
-            };
-
-            return (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 camera-overlay backdrop-blur-sm">
-                    <div className="bg-slate-900 border-2 border-slate-700 rounded-2xl overflow-hidden w-full max-w-md shadow-2xl relative">
-                        
-                        {/* HEADER */}
-                        <div className="p-4 bg-slate-800 flex justify-between items-center border-b border-slate-700">
-                            <div className="flex items-center gap-2 text-cyan-400">
-                                <Icons.Brain />
-                                <span className="font-mono font-bold tracking-wider">MUVN SECURITY</span>
-                            </div>
-                            <button onClick={onCancel} className="text-slate-400 hover:text-white"><Icons.X /></button>
-                        </div>
-                        
-                        {/* VISOR */}
-                        <div className="relative bg-black aspect-[3/4] flex items-center justify-center overflow-hidden group">
-                            <video 
-                                ref={videoRef} 
-                                autoPlay 
-                                muted 
-                                playsInline 
-                                onPlay={handleVideoPlay}
-                                className="w-full h-full object-cover scale-x-[-1] opacity-80"
-                            />
-                            <canvas ref={canvasRef} className="absolute inset-0 w-full h-full scale-x-[-1]" />
-                            
-                            {/* ESCANER VISUAL */}
-                            <div className="scanner-line"></div>
-                            
-                            {/* MENSAJES DE ESTADO (HUD) */}
-                            <div className="absolute top-4 left-4 right-4 text-center">
-                                <span className={`inline-block px-3 py-1 rounded font-mono text-xs font-bold backdrop-blur-md border ${
-                                    matchResult === 'match' ? 'bg-green-500/20 border-green-500 text-green-400' : 
-                                    'bg-cyan-500/20 border-cyan-500 text-cyan-400'
-                                }`}>
-                                    {matchResult === 'match' ? 'ROSTRO ENCONTRADO' : status}
-                                </span>
-                            </div>
-                        </div>
-
-                        {/* BOTONES */}
-                        <div className="p-6 bg-slate-800">
-                            <div className={`text-center font-bold text-lg text-slate-400`}>
-                                {matchResult === 'match' ? "CONTINUANDO AL 2º FACTOR..." : "ESPERANDO DETECCIÓN BIOMÉTRICA..."}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            );
-        };
-
-        // --- COMPONENTE DE AUTENTICACIÓN SECRETA (2º FACTOR) ---
-        const SecretAuth = ({ caregiverName, requiredDob, requiredPet, onSuccess }) => {
-            const [dob, setDob] = React.useState('');
-            const [pet, setPet] = React.useState('');
-            const [error, setError] = React.useState('');
-
-            const handleSubmit = (e) => {
-                e.preventDefault();
-                setError('');
-
-                // Limpiar y normalizar entradas
-                const cleanDob = dob.trim();
-                const cleanPet = pet.trim().toLowerCase();
-                const cleanRequiredPet = requiredPet.toLowerCase();
-
-                if (cleanDob === requiredDob && cleanPet === cleanRequiredPet) {
-                    onSuccess();
-                } else {
-                    setError('ERROR DE AUTENTICACIÓN. Verifica Fecha y Mascota.');
-                }
-            };
-
-            return (
-                <div className="glass-panel p-6 rounded-xl shadow-lg space-y-4 border-2 border-amber-500/50">
-                    <h2 className="text-xl font-bold text-amber-300 flex items-center gap-2">
-                        <Icons.Lock /> Verificación de Acceso Seguro (Paso 2)
-                    </h2>
-                    <p className="text-sm text-slate-400">
-                        {caregiverName}, confirma tu identidad para acceder a la ficha de tu paciente.
-                    </p>
-                    <form onSubmit={handleSubmit} className="space-y-4">
-                        <div>
-                            <label className="block text-sm font-medium text-slate-300 mb-1 flex items-center gap-2">
-                                <Icons.Calendar /> Fecha de Nacimiento (YYYY-MM-DD)
-                            </label>
-                            <input
-                                type="date"
-                                value={dob}
-                                onChange={(e) => setDob(e.target.value)}
-                                className="w-full p-3 bg-slate-800 border border-slate-600 rounded-lg text-lg text-white outline-none focus:border-amber-500 transition-colors"
-                                required
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-slate-300 mb-1 flex items-center gap-2">
-                                <Icons.Paw /> Nombre de tu Mascota
-                            </label>
-                            <input
-                                type="text"
-                                value={pet}
-                                onChange={(e) => setPet(e.target.value)}
-                                className="w-full p-3 bg-slate-800 border border-slate-600 rounded-lg text-lg text-white outline-none focus:border-amber-500 transition-colors"
-                                placeholder="Ej: Luna, Rocky, Toby"
-                                required
-                            />
-                        </div>
-                        <button type="submit" className="w-full py-3 rounded font-bold flex items-center justify-center gap-2 transition-all bg-amber-600 hover:bg-amber-500 text-white shadow-md shadow-amber-900/50">
-                            <Icons.ShieldCheck /> Confirmar Identidad
-                        </button>
-                    </form>
-                    {error && (
-                        <p className="text-sm text-center text-red-400 bg-red-900/30 p-2 rounded flex items-center justify-center gap-2">
-                            <Icons.AlertCircle /> {error}
-                        </p>
-                    )}
-                </div>
-            );
-        };
-
-
+        // --- COMPONENTE PRINCIPAL ---
         function App() {
-            // --- ESTADOS ---
-            const [caregiverData, setCaregiverData] = React.useState(null); // Objeto completo del cuidador logueado
-            const [caregiverPhoto, setCaregiverPhoto] = React.useState(null); 
-            const [showScanner, setShowScanner] = React.useState(false); 
-            const [tempCaregiverName, setTempCaregiverName] = React.useState(""); 
-            const [isSecretAuthenticated, setIsSecretAuthenticated] = React.useState(false); // Nuevo estado para el 2º factor
-
+            const [caregiver, setCaregiver] = React.useState("");
             const [shift, setShift] = React.useState("");
+            const [patientId, setPatientId] = React.useState("");
             const [records, setRecords] = React.useState({});
 
-            // --- CARGAR DATOS ---
             React.useEffect(() => {
-                const savedApp = localStorage.getItem('careApp_data_v7');
-                if (savedApp) {
-                    const parsed = JSON.parse(savedApp);
-                    setCaregiverData(parsed.caregiverData || null);
-                    setCaregiverPhoto(parsed.caregiverPhoto || null);
-                    setIsSecretAuthenticated(parsed.isSecretAuthenticated || false);
+                const saved = localStorage.getItem('careApp_data');
+                if (saved) {
+                    const parsed = JSON.parse(saved);
+                    setCaregiver(parsed.caregiver || "");
                     setShift(parsed.shift || "");
+                    setPatientId(parsed.patientId || "");
                     setRecords(parsed.records || {});
                 }
             }, []);
 
-            // --- GUARDAR DATOS ---
             React.useEffect(() => {
-                const dataToSave = { caregiverData, caregiverPhoto, isSecretAuthenticated, shift, records };
-                localStorage.setItem('careApp_data_v7', JSON.stringify(dataToSave));
-            }, [caregiverData, caregiverPhoto, isSecretAuthenticated, shift, records]);
+                const dataToSave = { caregiver, shift, patientId, records };
+                localStorage.setItem('careApp_data', JSON.stringify(dataToSave));
+            }, [caregiver, shift, patientId, records]);
 
-            const initiateCaregiverSelection = (e) => {
-                const name = e.target.value;
-                if (name) {
-                    setTempCaregiverName(name);
-                    setShowScanner(true); 
-                } else {
-                    setCaregiverData(null);
-                    setCaregiverPhoto(null);
-                    setIsSecretAuthenticated(false);
-                }
-            };
-
-            const handleBiometricSuccess = (photoData, descriptor) => {
-                // Almacenar temporalmente la foto y los datos para el 2º factor
-                const selectedData = CAREGIVER_DATA.find(c => c.name === tempCaregiverName);
-                if (selectedData) {
-                    setCaregiverData(selectedData);
-                }
-                setCaregiverPhoto(photoData);    
-                setShowScanner(false); // Cerrar escáner para mostrar el 2º factor
-            };
-
-            const handleSecretSuccess = () => {
-                setIsSecretAuthenticated(true); // El usuario ha pasado el 2º factor
-            };
-
-            const cancelScanner = () => {
-                setShowScanner(false);
-                setTempCaregiverName("");
-            };
-            
             const handleTaskCheck = (taskId) => {
                 const now = new Date();
                 const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
+                const dateString = now.toLocaleDateString([], {day: 'numeric', month: 'short'});
+
                 setRecords(prev => {
                     const current = prev[taskId] || {};
-                    if (current.checked) return { ...prev, [taskId]: { ...current, checked: false, time: null } };
-                    return { ...prev, [taskId]: { ...current, checked: true, time: timeString } };
+                    if (current.checked) {
+                        return { ...prev, [taskId]: { ...current, checked: false, time: null } };
+                    } else {
+                        return { ...prev, [taskId]: { ...current, checked: true, time: `${dateString}, ${timeString}` } };
+                    }
                 });
             };
 
             const handleTaskNote = (taskId, text) => {
-                setRecords(prev => ({ ...prev, [taskId]: { ...(prev[taskId] || {}), note: text } }));
+                setRecords(prev => ({
+                    ...prev,
+                    [taskId]: { ...(prev[taskId] || {}), note: text }
+                }));
             };
 
             const resetAll = () => {
-                if(window.confirm("¿Cerrar sesión y finalizar turno?")) {
-                    setCaregiverData(null); 
-                    setCaregiverPhoto(null); 
-                    setIsSecretAuthenticated(false);
-                    setShift(""); 
+                if(window.confirm("ÂżEstĂˇs seguro de borrar todos los datos del turno actual?")) {
+                    setCaregiver("");
+                    setShift("");
+                    setPatientId("");
                     setRecords({});
-                    localStorage.removeItem('careApp_data_v7');
+                    localStorage.removeItem('careApp_data');
                 }
             };
 
             const generateWhatsAppLink = () => {
-                if (!caregiverData || !shift || !isSecretAuthenticated) { alert("Faltan datos de turno o autenticación."); return; }
+                if (!caregiver || !shift || !patientId) {
+                    alert("Por favor completa la informaciĂłn bĂˇsica antes de enviar.");
+                    return;
+                }
 
-                // Obtener datos del paciente asignado
-                const patient = PATIENTS.find(p => p.id === caregiverData.patientId);
+                const patient = PATIENTS.find(p => p.id === patientId);
                 const taskList = patient.tasks[shift] || [];
                 
-                let message = `🔐 *REPORTE MUVN SEGURO*\n`;
-                message += `📅 *Fecha:* ${new Date().toLocaleDateString()}\n`;
-                message += `👤 *Cuidador:* ${caregiverData.name}\n`;
-                message += `🛡️ *Doble Factor:* Verificado\n`;
-                message += `🌗 *Turno:* ${shift.toUpperCase()}\n`;
-                message += `👴 *Paciente:* ${patient.name} (${patient.details})\n\n`;
-                message += `✅ *TAREAS REALIZADAS:*\n`;
+                let message = `đź“‹ *REPORTE DE CUIDADO DIARIO - MUVN*\n`;
+                message += `đź“… *Fecha:* ${new Date().toLocaleDateString()}\n`;
+                message += `đź‘¤ *Cuidador:* ${caregiver}\n`;
+                message += `đźŚ— *Turno:* ${shift === 'dia' ? 'â€ď¸Ź MaĂ±ana/Tarde' : 'đźŚ™ Noche'}\n`;
+                message += `đź‘´ *Paciente:* ${patient.name}\n\n`;
+                message += `âś… *ACTIVIDADES REALIZADAS:*\n`;
                 
-                let anyChecked = false;
-
+                let completedCount = 0;
                 taskList.forEach(task => {
                     const rec = records[task.id];
                     if (rec && rec.checked) {
-                        anyChecked = true;
-                        message += `🔹 ${task.text} (${rec.time})\n`;
-                        if (rec.note) message += `   📝 ${rec.note}\n`;
+                        completedCount++;
+                        message += `đź”ą *${task.text}*\n`;
+                        message += `   đź•’ Hora: ${rec.time}\n`;
+                        if (rec.note) message += `   đź“ť Obs: ${rec.note}\n`;
                     }
                 });
 
-                if (!anyChecked) {
-                    message += "_(Ninguna tarea marcada como realizada en este reporte.)_\n";
-                }
-                
+                if (completedCount === 0) message += `   (Ninguna actividad registrada aĂşn)\n`;
+
+                message += `\nâš ď¸Ź *PENDIENTES / NO REALIZADOS:*\n`;
+                taskList.forEach(task => {
+                    const rec = records[task.id];
+                    if (!rec || !rec.checked) {
+                        message += `đź”¸ ${task.text}`;
+                        if (rec && rec.note) message += ` (Obs: ${rec.note})`;
+                        message += `\n`;
+                    }
+                });
+
                 const encodedMsg = encodeURIComponent(message);
                 window.open(`https://wa.me/524451586270?text=${encodedMsg}`, '_blank');
             };
 
-            const currentPatient = caregiverData ? PATIENTS.find(p => p.id === caregiverData.patientId) : null;
+            const currentPatient = PATIENTS.find(p => p.id === patientId);
             const currentTasks = (currentPatient && shift) ? currentPatient.tasks[shift] : [];
 
             return (
-                <div className="max-w-3xl mx-auto relative min-h-screen bg-slate-900">
-                    {/* MODAL DEL ESCÁNER BIOMÉTRICO */}
-                    {showScanner && (
-                        <BiometricScanner 
-                            userName={tempCaregiverName} 
-                            onAuthSuccess={handleBiometricSuccess} 
-                            onCancel={cancelScanner} 
-                        />
-                    )}
-
-                    <header className="bg-slate-800 text-white p-4 shadow-lg sticky top-0 z-10 border-b border-cyan-900">
+                <div className="max-w-3xl mx-auto">
+                    {/* HEADER */}
+                    <header className="bg-sky-600 text-white p-4 shadow-md sticky top-0 z-10 rounded-b-xl">
                         <div className="flex justify-between items-center">
                             <div>
-                                <h1 className="text-xl font-bold flex items-center gap-2 text-cyan-400 font-mono tracking-tighter">
-                                    <Icons.ShieldCheck /> MUVN <span className="text-[10px] bg-cyan-900 text-cyan-200 px-1 rounded">SECURE v7</span>
+                                <h1 className="text-xl font-bold flex items-center gap-2">
+                                    <Icons.Activity />
+                                    MUVN
                                 </h1>
+                                <p className="text-xs text-sky-100 font-medium">Registro de Cuidados</p>
                             </div>
-                            <button onClick={resetAll} className="bg-red-600 hover:bg-red-700 text-white p-2 rounded flex items-center gap-1 text-xs">
-                                <Icons.Trash2 /> Salir
+                            <button 
+                                onClick={resetAll}
+                                className="bg-rose-500 hover:bg-rose-600 text-white p-2 rounded-lg text-xs flex items-center gap-1 transition-colors shadow-sm"
+                            >
+                                <Icons.Trash2 />
+                                Reiniciar
                             </button>
                         </div>
                     </header>
 
+                    {/* MENSAJE MOTIVACIONAL INTERNO */}
+                    <div className="mx-4 mt-4 bg-white p-3 rounded-lg border border-sky-100 shadow-sm flex items-center gap-3">
+                         <div className="p-2 bg-sky-100 rounded-full text-sky-600">
+                            <Icons.Heart />
+                         </div>
+                         <div>
+                            <p className="text-sm text-gray-700 italic">"Cuidar con el corazĂłn hace la diferencia."</p>
+                            <p className="text-xs text-gray-500 font-semibold">Gracias por tu dedicaciĂłn diaria.</p>
+                         </div>
+                    </div>
+
                     <main className="p-4 space-y-6">
-                        
-                        {/* 1. SELECCIÓN CUIDADOR / BIOMETRÍA */}
-                        <section className="glass-panel p-4 rounded-xl shadow-lg border border-slate-700">
-                            <label className="block text-sm font-bold text-cyan-100 mb-2 flex items-center gap-2">
-                                <Icons.User /> Seleccionar Cuidador
+
+                        {/* 1. SELECCIĂ“N DE CUIDADOR */}
+                        <section className="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+                            <label className="block text-sm font-semibold text-gray-600 mb-2 flex items-center gap-2">
+                                <Icons.User />
+                                Selecciona Cuidador
                             </label>
-                            
-                            {!caregiverData ? (
-                                <select onChange={initiateCaregiverSelection} value="" className="w-full p-3 bg-slate-800 border border-slate-600 rounded-lg text-lg text-white outline-none focus:border-cyan-500 transition-colors">
-                                    <option value="">-- Iniciar Proceso de Acceso --</option>
-                                    {CAREGIVER_DATA.map(c => <option key={c.name} value={c.name}>{c.name}</option>)}
-                                </select>
-                            ) : (
-                                <div className="flex items-center gap-4 bg-cyan-900/30 border border-cyan-500/50 p-4 rounded-lg animate-fade-in">
-                                    <div className="relative w-16 h-16 rounded-full overflow-hidden border-2 border-cyan-400 shadow-[0_0_15px_rgba(34,211,238,0.5)]">
-                                        {caregiverPhoto ? 
-                                            <img src={caregiverPhoto} className="w-full h-full object-cover" alt="Foto del Cuidador" />
-                                            : <div className="w-full h-full bg-slate-700 flex items-center justify-center"><Icons.Camera /></div>
-                                        }
-                                    </div>
-                                    <div>
-                                        <p className="text-xs text-cyan-400 font-bold tracking-widest mb-1">CUIDADOR ENCONTRADO</p>
-                                        <h2 className="text-xl font-bold text-white">{caregiverData.name}</h2>
-                                    </div>
-                                </div>
-                            )}
+                            <select 
+                                value={caregiver} 
+                                onChange={(e) => setCaregiver(e.target.value)}
+                                className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-lg focus:ring-2 focus:ring-sky-500 outline-none"
+                            >
+                                <option value="">-- Elige tu nombre --</option>
+                                {CAREGIVERS.map(c => <option key={c} value={c}>{c}</option>)}
+                            </select>
                         </section>
 
-                        {/* 2. AUTENTICACIÓN SECRETA (DOBLE FACTOR) */}
-                        {caregiverData && !isSecretAuthenticated && (
-                            <SecretAuth
-                                caregiverName={caregiverData.name}
-                                requiredDob={caregiverData.dob}
-                                requiredPet={caregiverData.pet}
-                                onSuccess={handleSecretSuccess}
-                            />
-                        )}
+                        {/* 2. SELECCIĂ“N DE TURNO */}
+                        <section className="grid grid-cols-2 gap-4">
+                            <button 
+                                onClick={() => setShift('dia')}
+                                className={`p-4 rounded-xl border-2 flex flex-col items-center justify-center gap-2 transition-all ${shift === 'dia' ? 'border-amber-400 bg-amber-50 text-amber-700' : 'border-gray-200 bg-white text-gray-400'}`}
+                            >
+                                <div className={shift === 'dia' ? 'text-amber-500' : ''}>
+                                    <Icons.Sun />
+                                </div>
+                                <span className="font-bold">Turno DĂ­a</span>
+                            </button>
+                            <button 
+                                onClick={() => setShift('noche')}
+                                className={`p-4 rounded-xl border-2 flex flex-col items-center justify-center gap-2 transition-all ${shift === 'noche' ? 'border-indigo-500 bg-indigo-50 text-indigo-700' : 'border-gray-200 bg-white text-gray-400'}`}
+                            >
+                                <div className={shift === 'noche' ? 'text-indigo-600' : ''}>
+                                    <Icons.Moon />
+                                </div>
+                                <span className="font-bold">Turno Noche</span>
+                            </button>
+                        </section>
 
-                        {/* CONTENIDO PRINCIPAL (SÓLO SI PASÓ LOS 2 FACTORES) */}
-                        {isSecretAuthenticated && caregiverData && (
-                            <div className="space-y-6 animate-fade-in text-gray-200">
-                                
-                                {/* ASIGNACIÓN PACIENTE ÚNICO */}
-                                <section className="glass-panel p-4 rounded-xl shadow-md border-2 border-green-500/50">
-                                    <h2 className="text-lg font-bold text-green-400 flex items-center gap-2">
-                                        <Icons.ShieldCheck /> Acceso Autorizado
-                                    </h2>
-                                    <p className="text-sm text-slate-300 mt-1">
-                                        Solo puedes ver y registrar información para tu paciente asignado:
-                                    </p>
-                                    <div className="mt-3 bg-slate-800 p-3 rounded border border-slate-600">
-                                        <div className="font-bold text-xl text-white">{currentPatient.name}</div>
-                                        <div className="text-sm text-slate-400">{currentPatient.details}</div>
-                                    </div>
-                                </section>
-
-                                {/* 3. SELECCIÓN TURNO */}
-                                <section className="grid grid-cols-2 gap-4">
-                                    <button onClick={() => setShift('dia')} className={`p-4 rounded-xl border-2 flex flex-col items-center gap-2 transition-all ${shift === 'dia' ? 'border-amber-500 bg-amber-900/20 text-amber-400 shadow-[0_0_20px_rgba(245,158,11,0.2)]' : 'border-slate-700 bg-slate-800 text-slate-500 hover:border-slate-500'}`}>
-                                        <Icons.Sun /><span className="font-bold">Turno Día</span>
-                                    </button>
-                                    <button onClick={() => setShift('noche')} className={`p-4 rounded-xl border-2 flex flex-col items-center gap-2 transition-all ${shift === 'noche' ? 'border-indigo-500 bg-indigo-900/20 text-indigo-400 shadow-[0_0_20px_rgba(99,102,241,0.2)]' : 'border-slate-700 bg-slate-800 text-slate-500 hover:border-slate-500'}`}>
-                                        <Icons.Moon /><span className="font-bold">Turno Noche</span>
-                                    </button>
-                                </section>
-
-                                {/* 4. TAREAS */}
-                                {shift && (
-                                    <section className="space-y-3 pb-20">
-                                        <h2 className="text-xl font-bold text-cyan-400 mb-4 flex items-center gap-2">
-                                            <Icons.ClipboardList /> Tareas para el Turno {shift === 'dia' ? 'Día' : 'Noche'}
-                                        </h2>
-                                        {currentTasks.map(task => {
-                                            const rec = records[task.id] || {};
-                                            const isChecked = rec.checked;
-                                            return (
-                                                <div key={task.id} className={`p-4 rounded-lg shadow transition-all border-l-4 ${isChecked ? 'bg-slate-800 border-l-slate-600 opacity-70' : 'bg-slate-800 border-l-cyan-500'}`}>
-                                                    <div className="flex gap-3">
-                                                        <button onClick={() => handleTaskCheck(task.id)} className={`w-8 h-8 rounded-full border-2 flex items-center justify-center transition-all ${isChecked ? 'bg-green-600 border-green-600 text-white' : 'border-slate-500 hover:border-cyan-400'}`}>
-                                                            <Icons.CheckCircle className={isChecked ? 'opacity-100' : 'opacity-0'} />
-                                                        </button>
-                                                        <div className="flex-1">
-                                                            <h3 className={`font-medium ${isChecked ? 'line-through text-slate-500' : 'text-gray-200'}`}>{task.text}</h3>
-                                                            {task.details && <div className="text-xs text-amber-400 mt-1 flex items-center gap-1"><Icons.AlertCircle /> {task.details}</div>}
-                                                            {isChecked && <span className="text-[10px] bg-green-900 text-green-300 px-2 py-0.5 rounded mt-2 inline-block font-mono">{rec.time}</span>}
-                                                        </div>
-                                                    </div>
-                                                    <textarea 
-                                                        placeholder="Notas del turno (ej: 'Glucosa en 120mg/dl', 'Sin incidentes')..." 
-                                                        value={rec.note || ""} 
-                                                        onChange={(e) => handleTaskNote(task.id, e.target.value)} 
-                                                        className="w-full mt-3 p-2 text-sm bg-slate-900 border border-slate-700 rounded text-gray-300 focus:border-cyan-500 outline-none" 
-                                                        rows={1} 
-                                                    />
-                                                </div>
-                                            )
-                                        })}
-                                    </section>
-                                )}
+                        {/* 3. SELECCIĂ“N DE PACIENTE */}
+                        <section className="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+                           <label className="block text-sm font-semibold text-gray-600 mb-2 flex items-center gap-2">
+                                <Icons.ClipboardList />
+                                Selecciona Paciente
+                            </label>
+                            <div className="space-y-2">
+                                {PATIENTS.map(p => (
+                                <button
+                                    key={p.id}
+                                    onClick={() => setPatientId(p.id)}
+                                    className={`w-full text-left p-3 rounded-lg border transition-all ${patientId === p.id ? 'border-sky-500 bg-sky-50 ring-1 ring-sky-500' : 'border-gray-200 hover:bg-gray-50'}`}
+                                >
+                                    <div className="font-bold text-gray-800">{p.name}</div>
+                                    {patientId === p.id && (
+                                    <div className="text-xs text-sky-600 mt-1">{p.details}</div>
+                                    )}
+                                </button>
+                                ))}
                             </div>
+                        </section>
+
+                        {/* 4. LISTA DE TAREAS DINĂMICAS */}
+                        {caregiver && shift && patientId && (
+                            <section className="space-y-4 animate-fade-in">
+                                <div className="flex items-center gap-2 mb-2">
+                                    <h2 className="text-lg font-bold text-gray-800">
+                                        Lista de Obligaciones ({shift === 'dia' ? 'DĂ­a' : 'Noche'})
+                                    </h2>
+                                    <span className="bg-sky-100 text-sky-800 text-xs px-2 py-1 rounded-full font-medium">
+                                        {currentTasks.length} Tareas
+                                    </span>
+                                </div>
+
+                                {currentTasks.map((task) => {
+                                    const record = records[task.id] || {};
+                                    const isChecked = record.checked || false;
+
+                                    let borderClass = "border-gray-200";
+                                    if (task.type === 'med') borderClass = "border-l-4 border-l-rose-400";
+                                    if (task.type === 'vital') borderClass = "border-l-4 border-l-emerald-400";
+                                    if (task.type === 'check') borderClass = "border-l-4 border-l-purple-400";
+                                    if (task.type === 'env') borderClass = "border-l-4 border-l-sky-400";
+
+                                    return (
+                                        <div key={task.id} className={`bg-white rounded-lg shadow-sm border p-4 ${borderClass} transition-all ${isChecked ? 'bg-gray-50' : ''}`}>
+                                            <div className="flex items-start gap-3">
+                                                <button
+                                                    onClick={() => handleTaskCheck(task.id)}
+                                                    className={`mt-1 flex-shrink-0 w-8 h-8 rounded-full border-2 flex items-center justify-center transition-all ${isChecked ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-gray-300 text-transparent hover:border-emerald-400'}`}
+                                                >
+                                                    <Icons.CheckCircle className={isChecked ? "opacity-100" : "opacity-0"} />
+                                                </button>
+                                                
+                                                <div className="flex-1">
+                                                    <h3 className={`font-medium text-gray-800 text-lg leading-tight ${isChecked ? 'line-through text-gray-400' : ''}`}>
+                                                        {task.text}
+                                                    </h3>
+                                                    
+                                                    {task.note && (
+                                                        <div className="mt-1 flex items-start gap-1 text-sm text-amber-600 bg-amber-50 p-2 rounded">
+                                                            <div className="mt-0.5"><Icons.AlertCircle /></div>
+                                                            <span>{task.note}</span>
+                                                        </div>
+                                                    )}
+
+                                                    {isChecked && record.time && (
+                                                        <div className="mt-2 inline-flex items-center gap-1 text-xs font-bold text-emerald-700 bg-emerald-100 px-2 py-1 rounded">
+                                                            <Icons.Clock />
+                                                            Completado: {record.time}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
+
+                                            <div className="mt-3 pl-11">
+                                                <textarea
+                                                    placeholder="Observaciones..."
+                                                    value={record.note || ""}
+                                                    onChange={(e) => handleTaskNote(task.id, e.target.value)}
+                                                    className="w-full text-sm p-2 border border-gray-200 rounded-md focus:ring-1 focus:ring-sky-400 outline-none resize-none bg-gray-50 focus:bg-white"
+                                                    rows={2}
+                                                />
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                            </section>
                         )}
+
                     </main>
 
-                    {/* BOTÓN DE REPORTE (SÓLO CUANDO HAY TURNO, PACIENTE Y AUTENTICACIÓN COMPLETA) */}
-                    {isSecretAuthenticated && caregiverData && shift && (
-                        <div className="fixed bottom-0 w-full bg-slate-900 border-t border-slate-700 p-4 z-20">
+                    {/* FOOTER */}
+                    {caregiver && shift && patientId && (
+                        <div className="fixed bottom-0 left-0 w-full bg-white border-t border-gray-200 p-4 shadow-lg z-20">
                             <div className="max-w-3xl mx-auto">
-                                <button onClick={generateWhatsAppLink} className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-xl shadow-lg shadow-emerald-900/50 flex flex-col items-center leading-tight transition-transform active:scale-95">
-                                    <div className="flex items-center gap-2 text-lg">
-                                        <Icons.Send /> Enviar Reporte de {currentPatient.name}
-                                    </div>
-                                    <span className="text-[10px] opacity-75">Vía WhatsApp - Identidad verificada</span>
+                                <button
+                                    onClick={generateWhatsAppLink}
+                                    className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-6 rounded-xl shadow-md flex items-center justify-center gap-2 text-lg transition-transform active:scale-95"
+                                >
+                                    <Icons.Send />
+                                    Enviar Reporte
                                 </button>
                             </div>
                         </div>
