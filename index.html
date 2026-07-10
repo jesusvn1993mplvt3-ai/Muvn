@@ -117,29 +117,33 @@
 
     <div class="card">
         <h2>⬇️ Descargar archivos para la laptop</h2>
-        <p>Coloca todos los archivos en la <strong>misma carpeta</strong> y ejecuta <code>run_control.bat</code> como administrador.</p>
+        <p>Coloca todos los archivos en la <strong>misma carpeta</strong> y descarga la clave de Firebase.</p>
         <div class="file-grid">
             <div class="file-item">
-                <strong>🐍 Script Python</strong>
-                <button onclick="downloadScript()" class="info">Descargar parental_control.py</button>
+                <strong>🐍 Script Principal</strong>
+                <button onclick="downloadScript()" class="info">parental_control.py</button>
             </div>
             <div class="file-item">
-                <strong>⚙️ Ejecutor</strong>
-                <button onclick="downloadBat()" class="success">Descargar run_control.bat</button>
+                <strong>🛡️ Ejecutor (Tuyo)</strong>
+                <button onclick="downloadBat()" class="success">run_control.bat</button>
+            </div>
+            <div class="file-item">
+                <strong>👦 Para tu Hermano</strong>
+                <button onclick="downloadBrotherBat()" class="info" style="background: #8e44ad;">actualizar_bloqueo.bat</button>
             </div>
             <div class="file-item">
                 <strong>🧹 Flush DNS</strong>
-                <button onclick="downloadFlush()" class="danger">Descargar flush_dns.bat</button>
+                <button onclick="downloadFlush()" class="danger">flush_dns.bat</button>
             </div>
         </div>
         <div class="instructions">
-            <strong>📝 Instrucciones:</strong>
+            <strong>📝 Instrucciones de Instalación:</strong>
             <ol>
-                <li>Descarga los tres archivos y colócalos en una carpeta de la laptop.</li>
-                <li>Descarga la clave de servicio (Service Account JSON) desde <a href="https://console.firebase.google.com/project/muvn-72b44/settings/serviceaccounts/adminsdk" target="_blank">Firebase Console → Configuración → Cuentas de servicio</a>.</li>
-                <li>Renombra la clave como <code>serviceAccountKey.json</code> y colócala en la <strong>misma carpeta</strong>.</li>
-                <li>Ejecuta <code>run_control.bat</code> <strong>como administrador</strong> (clic derecho → Ejecutar como administrador).</li>
-                <li>Si ves errores de permisos, revisa que el antivirus no esté bloqueando la escritura en hosts.</li>
+                <li>Descarga <strong>parental_control.py</strong> y los archivos <strong>.bat</strong> que necesites.</li>
+                <li>Descarga la clave de servicio (JSON) desde <a href="https://console.firebase.google.com/project/muvn-72b44/settings/serviceaccounts/adminsdk" target="_blank">Firebase Console</a>.</li>
+                <li>Renombra la clave como <code>serviceAccountKey.json</code> y ponla en la misma carpeta.</li>
+                <li><strong>Para ti:</strong> Ejecuta <code>run_control.bat</code> como administrador para monitoreo constante.</li>
+                <li><strong>Para tu hermano:</strong> Ponle <code>actualizar_bloqueo.bat</code> en su escritorio. Cuando él lo abra (como admin), se aplicarán tus cambios de este panel al instante.</li>
             </ol>
         </div>
     </div>
@@ -158,24 +162,6 @@
 
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
-
-        // ===== CREAR COLECCIÓN SI NO EXISTE =====
-        async function ensureCollection() {
-            try {
-                const snapshot = await db.collection('blocked_sites').limit(1).get();
-                if (snapshot.empty) {
-                    await db.collection('blocked_sites').add({
-                        url: 'facebook.com',
-                        blocked: true,
-                        unblock_until: null
-                    });
-                    console.log('Colección creada con sitio de ejemplo.');
-                }
-            } catch (e) {
-                console.error('Error al verificar colección:', e);
-            }
-        }
-        ensureCollection();
 
         // ===== FUNCIONES DE RENDERIZADO =====
         function formatDate(ts) {
@@ -222,10 +208,6 @@
                     btn5.textContent = '5 min';
                     btn5.onclick = () => unblockForMinutes(id, 5);
 
-                    const btn10 = document.createElement('button');
-                    btn10.textContent = '10 min';
-                    btn10.onclick = () => unblockForMinutes(id, 10);
-
                     const btn30 = document.createElement('button');
                     btn30.textContent = '30 min';
                     btn30.onclick = () => unblockForMinutes(id, 30);
@@ -235,38 +217,25 @@
                     btnDelete.className = 'danger';
                     btnDelete.onclick = () => deleteSite(id);
 
-                    btnGroup.append(btnToggle, btn5, btn10, btn30, btnDelete);
+                    btnGroup.append(btnToggle, btn5, btn30, btnDelete);
                     div.append(urlSpan, statusSpan, btnGroup);
                     container.appendChild(div);
                 });
             });
         }
 
-        // Funciones de escritura
         async function addSite() {
             const url = document.getElementById('newUrl').value.trim();
             if (!url) return;
             try {
-                await db.collection('blocked_sites').add({
-                    url: url,
-                    blocked: true,
-                    unblock_until: null
-                });
+                await db.collection('blocked_sites').add({ url, blocked: true, unblock_until: null });
                 document.getElementById('newUrl').value = '';
-            } catch (e) {
-                alert('Error al agregar: ' + e.message);
-            }
+            } catch (e) { alert('Error: ' + e.message); }
         }
 
         async function toggleBlock(id, blocked) {
-            try {
-                await db.collection('blocked_sites').doc(id).update({
-                    blocked: blocked,
-                    unblock_until: null
-                });
-            } catch (e) {
-                alert('Error: ' + e.message);
-            }
+            try { await db.collection('blocked_sites').doc(id).update({ blocked, unblock_until: null }); }
+            catch (e) { alert('Error: ' + e.message); }
         }
 
         async function unblockForMinutes(id, minutes) {
@@ -276,18 +245,13 @@
                     blocked: true,
                     unblock_until: firebase.firestore.Timestamp.fromDate(until)
                 });
-            } catch (e) {
-                alert('Error: ' + e.message);
-            }
+            } catch (e) { alert('Error: ' + e.message); }
         }
 
         async function deleteSite(id) {
-            if (!confirm('¿Eliminar este sitio?')) return;
-            try {
-                await db.collection('blocked_sites').doc(id).delete();
-            } catch (e) {
-                alert('Error: ' + e.message);
-            }
+            if (!confirm('¿Eliminar?')) return;
+            try { await db.collection('blocked_sites').doc(id).delete(); }
+            catch (e) { alert('Error: ' + e.message); }
         }
 
         // ===== DESCARGA DE ARCHIVOS =====
@@ -306,182 +270,102 @@ HOSTS_PATH = r"C:\\Windows\\System32\\drivers\\etc\\hosts"
 REDIRECT = "127.0.0.1"
 SERVICE_ACCOUNT = "serviceAccountKey.json"
 
-# === ELEVAR PRIVILEGIOS ===
 def is_admin():
-    try:
-        return ctypes.windll.shell32.IsUserAnAdmin()
-    except:
-        return False
+    try: return ctypes.windll.shell32.IsUserAnAdmin()
+    except: return False
 
 if not is_admin():
-    print("Reiniciando con permisos de administrador...")
     ctypes.windll.shell32.ShellExecuteW(None, "runas", sys.executable, " ".join(sys.argv), None, 1)
     sys.exit()
 
-# === LIMPIAR CACHÉ DNS ===
 def flush_dns():
-    try:
-        subprocess.run(["ipconfig", "/flushdns"], capture_output=True, check=True)
-        print("✅ Caché DNS limpiada.")
-    except Exception as e:
-        print(f"⚠️ No se pudo limpiar caché DNS: {e}")
+    try: subprocess.run(["ipconfig", "/flushdns"], capture_output=True)
+    except: pass
 
-# === INICIALIZAR FIREBASE ===
 if not firebase_admin._apps:
     if not os.path.exists(SERVICE_ACCOUNT):
-        print(f"ERROR: No se encuentra el archivo '{SERVICE_ACCOUNT}'. Coloca la clave de servicio en la misma carpeta.")
-        input("Presiona Enter para salir...")
+        print(f"ERROR: No se encuentra '{SERVICE_ACCOUNT}'")
         sys.exit(1)
     cred = credentials.Certificate(SERVICE_ACCOUNT)
     firebase_admin.initialize_app(cred)
 db = firestore.client()
 
-def get_blocked_sites():
-    sites_ref = db.collection('blocked_sites')
-    docs = sites_ref.stream()
-    blocked = []
+def update_hosts():
+    docs = db.collection('blocked_sites').stream()
+    blocked_urls = []
     now = datetime.now()
     for doc in docs:
         data = doc.to_dict()
         url = data.get('url')
-        if not url:
-            continue
         unblock_until = data.get('unblock_until')
-        if unblock_until and isinstance(unblock_until, datetime) and unblock_until > now:
-            continue
-        if not data.get('blocked', True):
-            continue
-        blocked.append(url)
-    return blocked
+        if unblock_until and unblock_until > now: continue
+        if not data.get('blocked', True): continue
+        blocked_urls.append(url)
 
-def update_hosts(blocked_urls):
-    try:
-        with open(HOSTS_PATH, 'r', encoding='utf-8') as file:
-            lines = file.readlines()
-    except PermissionError:
-        print("❌ ERROR: No se puede leer el archivo hosts. Ejecuta como administrador.")
-        return
-
-    # Filtrar líneas: conservar todas excepto las que tengan nuestras URLs o el comentario especial
-    new_lines = []
-    for line in lines:
-        # Si la línea contiene alguna URL de las que vamos a bloquear, la omitimos
-        if any(url in line for url in blocked_urls):
-            continue
-        # También eliminamos líneas que hayamos añadido anteriormente
-        if "# bloqueado_por_script" in line:
-            continue
-        new_lines.append(line)
-
-    # Añadir nuevas líneas
+    with open(HOSTS_PATH, 'r', encoding='utf-8') as f:
+        lines = f.readlines()
+    
+    new_lines = [l for l in lines if "# bloqueado_por_script" not in l and not any(u in l for u in blocked_urls)]
     for url in blocked_urls:
         new_lines.append(f"{REDIRECT} {url} # bloqueado_por_script\\n")
+        new_lines.append(f"{REDIRECT} www.{url} # bloqueado_por_script\\n")
 
-    try:
-        with open(HOSTS_PATH, 'w', encoding='utf-8') as file:
-            file.writelines(new_lines)
-        print(f"✅ Hosts actualizado. Bloqueados: {blocked_urls}")
-        # Limpiar caché DNS para aplicar cambios inmediatamente
-        flush_dns()
-    except PermissionError:
-        print("❌ ERROR: No se puede escribir en hosts. Ejecuta como administrador.")
-
-def main():
-    print("=== CONTROL PARENTAL INICIADO ===")
-    print("Monitoreando Firestore cada 10 segundos...")
-    print("Presiona Ctrl+C para detener.\\n")
-    while True:
-        try:
-            blocked = get_blocked_sites()
-            update_hosts(blocked)
-        except Exception as e:
-            print(f"❌ Error en ciclo: {e}")
-        time.sleep(10)
+    with open(HOSTS_PATH, 'w', encoding='utf-8') as f:
+        f.writelines(new_lines)
+    flush_dns()
+    print(f"✅ Actualizado: {len(blocked_urls)} sitios bloqueados.")
 
 if __name__ == "__main__":
-    main()
+    if "--once" in sys.argv:
+        update_hosts()
+    else:
+        print("=== MUVN CONTROL PARENTAL (ACTIVO) ===")
+        while True:
+            try: update_hosts()
+            except Exception as e: print(f"Error: {e}")
+            time.sleep(10)
 `;
             downloadFile(content, 'parental_control.py', 'text/x-python');
         }
 
         function downloadBat() {
             const content = `@echo off
-title Control Parental - MUVN
-echo ==============================
-echo  Control Parental v2
-echo ==============================
-echo.
-
-:: Verificar si se ejecuta como administrador
-net session >nul 2>&1
-if %errorlevel% neq 0 (
-    echo ⚠️  Este script necesita permisos de administrador.
-    echo    Haz clic derecho y selecciona "Ejecutar como administrador".
-    pause
-    exit /b
-)
-
-:: Ir a la carpeta del script (por si se ejecuta desde otro lugar)
+title MUVN - Control Parental
 cd /d "%~dp0"
-
-:: Verificar que existe el script Python
-if not exist "parental_control.py" (
-    echo ❌ No se encuentra parental_control.py en esta carpeta.
-    echo    Asegurate de tener todos los archivos en la misma carpeta.
-    pause
-    exit /b
+echo 🔍 Verificando librerias...
+python -c "import firebase_admin" 2>nul
+if %errorlevel% neq 0 (
+    echo 📦 Instalando firebase-admin...
+    pip install firebase-admin
 )
-
-:: Verificar que existe la clave de servicio
-if not exist "serviceAccountKey.json" (
-    echo ❌ No se encuentra serviceAccountKey.json.
-    echo    Descarga la clave desde Firebase Console y colócala aquí.
-    pause
-    exit /b
-)
-
-:: Limpiar caché DNS antes de iniciar
-echo 🔄 Limpiando caché DNS...
-ipconfig /flushdns >nul 2>&1
-echo ✅ Caché DNS limpiada.
-
-:: Ejecutar el script Python
-echo.
-echo 🚀 Iniciando script de control parental...
-echo    (Presiona Ctrl+C para detener)
-echo.
+echo 🚀 Iniciando...
 python parental_control.py
-
-:: Si el script termina, pausar para ver errores
-pause
-`;
+pause`;
             downloadFile(content, 'run_control.bat', 'text/plain');
+        }
+
+        function downloadBrotherBat() {
+            const content = `@echo off
+title MUVN - Actualizar Acceso
+cd /d "%~dp0"
+echo 🔄 Sincronizando permisos con el servidor...
+python -c "import firebase_admin" 2>nul
+if %errorlevel% neq 0 (
+    pip install firebase-admin >nul 2>&1
+)
+python parental_control.py --once
+echo.
+echo ✅ ¡Listo! Los permisos han sido actualizados.
+echo Ya puedes cerrar esta ventana.
+timeout /t 5`;
+            downloadFile(content, 'actualizar_bloqueo.bat', 'text/plain');
         }
 
         function downloadFlush() {
             const content = `@echo off
-title Flush DNS Cache
-echo ==============================
-echo  Limpiando caché DNS
-echo ==============================
-echo.
-
-:: Verificar permisos
-net session >nul 2>&1
-if %errorlevel% neq 0 (
-    echo ⚠️  Este script necesita permisos de administrador.
-    echo    Haz clic derecho y selecciona "Ejecutar como administrador".
-    pause
-    exit /b
-)
-
-:: Limpiar caché
 ipconfig /flushdns
-echo.
-echo ✅ Caché DNS limpiada.
-echo    Reinicia tu navegador para aplicar los cambios.
-pause
-`;
+echo ✅ DNS Limpiado.
+pause`;
             downloadFile(content, 'flush_dns.bat', 'text/plain');
         }
 
@@ -489,15 +373,13 @@ pause
             const blob = new Blob([content], { type: mimeType });
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
-            a.href = url;
-            a.download = filename;
+            a.href = url; a.download = filename;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
             window.URL.revokeObjectURL(url);
         }
 
-        // Iniciar renderizado
         renderSites();
     </script>
 </body>
