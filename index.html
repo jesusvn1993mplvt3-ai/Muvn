@@ -106,8 +106,20 @@
         }
 
         async function preLoadBlocklist() {
-            const list = ['tiktok.com', 'tiktokv.com', 'tiktokcdn.com', 'byteoversea.com', 'chatroulette.com', 'omegle.com', 'tinder.com', 'badoo.com'];
-            if(confirm("¿Cargar lista?")) { for(let url of list) await addSite(url); alert("Cargada."); }
+            const list = [
+                // TikTok y derivados
+                'tiktok.com', 'tiktokv.com', 'tiktokcdn.com', 'byteoversea.com', 'vasing.com', 'muscdn.com', 'musical.ly',
+                // Chatroulette y clones
+                'chatroulette.com', 'omegle.com', 'tinychat.com', 'emeraldchat.com', 'shagle.com', 'chatspin.com', 'coomeet.com', 'camsurf.com', 'luckycrush.live', 'chathub.cam', 'chatrandom.com',
+                // Bazoocam y variantes
+                'bazoocam.org', 'bazoocam.com', 'bazoocam.es', 'bazoocam.net', 'bazoocam.info', 'bazoocam.live', 'bazoocam.me', 'bazoocam.online',
+                // Citas y otros
+                'tinder.com', 'badoo.com', 'bumble.com', 'happn.com', 'grindr.com', 'meetic.es', 'pof.com', 'ashleymadison.com', 'badoodate.com'
+            ];
+            if(confirm("¿Cargar lista extendida de TikTok, Citas y Videochat (Bazoocam/Chatroulette)?")) { 
+                for(let url of list) await addSite(url); 
+                alert("¡Lista extendida cargada con éxito!"); 
+            }
         }
 
         async function toggleBlock(id, val) { await db.collection('blocked_sites').doc(id).update({ blocked: val, unblock_until: null }); }
