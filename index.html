@@ -3,383 +3,225 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Control Parental - MUVN</title>
-    <!-- Firebase SDK -->
+    <title>Control Parental PRO - MUVN</title>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
     <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            padding: 20px;
-            max-width: 800px;
-            margin: auto;
-            background: #f0f2f5;
-        }
-        h1, h2 { color: #1a1a2e; }
-        .card {
-            background: white;
-            padding: 15px 20px;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            margin-bottom: 20px;
-        }
-        .site {
-            border-bottom: 1px solid #e0e0e0;
-            padding: 12px 0;
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            gap: 8px;
-        }
-        .site:last-child { border-bottom: none; }
-        .url { font-weight: 600; flex: 1 1 120px; }
-        .status { font-size: 0.9em; color: #555; flex: 1 1 150px; }
-        button {
-            padding: 6px 12px;
-            border: none;
-            border-radius: 6px;
-            background: #2d4059;
-            color: white;
-            cursor: pointer;
-            font-size: 0.9em;
-            transition: 0.2s;
-        }
-        button:hover { background: #1a2a3a; }
-        button.danger { background: #e74c3c; }
-        button.danger:hover { background: #c0392b; }
-        button.success { background: #27ae60; }
-        button.success:hover { background: #1e8449; }
-        button.info { background: #3498db; }
-        button.info:hover { background: #2980b9; }
-        input {
-            padding: 10px;
-            width: 70%;
-            border: 1px solid #ccc;
-            border-radius: 6px;
-            font-size: 1em;
-        }
-        .btn-group { display: flex; flex-wrap: wrap; gap: 5px; }
-        .download-btn {
-            background: #3498db;
-            padding: 12px 24px;
-            font-size: 1.1em;
-            margin-top: 10px;
-            margin-right: 10px;
-        }
-        .download-btn:hover { background: #2980b9; }
-        .instructions {
-            background: #fef9e7;
-            border-left: 5px solid #f1c40f;
-            padding: 10px 15px;
-            margin: 15px 0;
-            border-radius: 4px;
-        }
-        .badge {
-            display: inline-block;
-            background: #2d4059;
-            color: white;
-            border-radius: 20px;
-            padding: 2px 12px;
-            font-size: 0.8em;
-            margin-left: 8px;
-        }
-        .file-grid {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
-            margin: 10px 0;
-        }
-        .file-item {
-            background: #eaf2f8;
-            border-radius: 8px;
-            padding: 10px 15px;
-            flex: 1 1 200px;
-            text-align: center;
-        }
-        .file-item button {
-            width: 100%;
-            margin-top: 5px;
-        }
+        body { font-family: 'Segoe UI', sans-serif; padding: 20px; max-width: 900px; margin: auto; background: #f0f2f5; }
+        .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        .site { border-bottom: 1px solid #eee; padding: 10px 0; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+        .url { font-weight: 600; flex: 1; min-width: 150px; }
+        .status { font-size: 0.9em; color: #666; width: 250px; }
+        button { padding: 8px 12px; border: none; border-radius: 6px; cursor: pointer; transition: 0.2s; font-weight: 500; }
+        .btn-add { background: #27ae60; color: white; }
+        .btn-danger { background: #e74c3c; color: white; }
+        .btn-time { background: #3498db; color: white; }
+        .btn-special { background: #8e44ad; color: white; }
+        input { padding: 10px; border: 1px solid #ddd; border-radius: 6px; width: 60%; }
+        .instructions { background: #fff9c4; padding: 15px; border-radius: 8px; border-left: 5px solid #fbc02d; margin-top: 15px; }
+        .file-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin: 15px 0; }
+        .file-item { background: #e3f2fd; padding: 15px; border-radius: 8px; text-align: center; border: 1px solid #bbdefb; }
     </style>
 </head>
 <body>
-    <h1>🚀 Control Parental</h1>
+    <h1>🚀 Control Parental MUVN v3</h1>
+    
     <div class="card">
-        <h2>📋 Sitios gestionados</h2>
+        <h2>➕ Gestión de Sitios</h2>
+        <div style="display:flex; gap:10px; margin-bottom:20px;">
+            <input id="newUrl" placeholder="ej. tiktok.com" />
+            <button onclick="addSite()" class="btn-add">Agregar Sitio</button>
+            <button onclick="preLoadBlocklist()" class="btn-special">Cargar Lista TikTok/Citas</button>
+        </div>
         <div id="sites-list"></div>
     </div>
 
     <div class="card">
-        <h2>➕ Agregar nuevo sitio</h2>
-        <input id="newUrl" placeholder="ej. twitter.com, youtube.com" />
-        <button onclick="addSite()" class="success">Agregar</button>
-    </div>
-
-    <div class="card">
-        <h2>⬇️ Descargar archivos para la laptop</h2>
-        <p>Coloca todos los archivos en la <strong>misma carpeta</strong> y descarga la clave de Firebase.</p>
+        <h2>⬇️ Archivos para la Laptop</h2>
         <div class="file-grid">
             <div class="file-item">
-                <strong>🐍 Script Principal</strong>
-                <button onclick="downloadScript()" class="info">parental_control.py</button>
+                <strong>🐍 Motor Python</strong><br><br>
+                <button onclick="downloadScript()" class="btn-time">parental_control.py</button>
             </div>
-            <div class="file-item">
-                <strong>🛡️ Ejecutor (Tuyo)</strong>
-                <button onclick="downloadBat()" class="success">run_control.bat</button>
-            </div>
-            <div class="file-item">
-                <strong>👦 Para tu Hermano</strong>
-                <button onclick="downloadBrotherBat()" class="info" style="background: #8e44ad;">actualizar_bloqueo.bat</button>
-            </div>
-            <div class="file-item">
-                <strong>🧹 Flush DNS</strong>
-                <button onclick="downloadFlush()" class="danger">flush_dns.bat</button>
+            <div class="file-item" style="background: #f3e5f5; border-color: #e1bee7;">
+                <strong>👦 Para tu Hermano</strong><br><br>
+                <button onclick="downloadBrotherBat()" class="btn-special">actualizar_acceso.bat</button>
             </div>
         </div>
         <div class="instructions">
-            <strong>📝 Instrucciones de Instalación:</strong>
-            <ol>
-                <li>Descarga <strong>parental_control.py</strong> y los archivos <strong>.bat</strong> que necesites.</li>
-                <li>Descarga la clave de servicio (JSON) desde <a href="https://console.firebase.google.com/project/muvn-72b44/settings/serviceaccounts/adminsdk" target="_blank">Firebase Console</a>.</li>
-                <li>Renombra la clave como <code>serviceAccountKey.json</code> y ponla en la misma carpeta.</li>
-                <li><strong>Para ti:</strong> Ejecuta <code>run_control.bat</code> como administrador para monitoreo constante.</li>
-                <li><strong>Para tu hermano:</strong> Ponle <code>actualizar_bloqueo.bat</code> en su escritorio. Cuando él lo abra (como admin), se aplicarán tus cambios de este panel al instante.</li>
-            </ol>
+            <strong>💡 Novedades de la v3:</strong>
+            <ul>
+                <li><strong>Auto-Instalación:</strong> El .bat instala solo lo que falta (Python/Firebase).</li>
+                <li><strong>Ruta Inteligente:</strong> La primera vez pedirá la carpeta donde están los archivos y la recordará.</li>
+                <li><strong>Temporizador Real:</strong> Si das permiso por 5 min, la laptop desbloquea, espera el tiempo y <strong>bloquea de nuevo automáticamente</strong> sin que nadie toque nada.</li>
+            </ul>
         </div>
     </div>
 
     <script>
-        // ===== CONFIGURACIÓN DE FIREBASE =====
         const firebaseConfig = {
             apiKey: "AIzaSyBvQxckDVA4UivGKwQU2da2fBMolOH8UDw",
             authDomain: "muvn-72b44.firebaseapp.com",
             projectId: "muvn-72b44",
             storageBucket: "muvn-72b44.firebasestorage.app",
             messagingSenderId: "365121286388",
-            appId: "1:365121286388:web:988306c20c71411e392ea1",
-            measurementId: "G-N1GGLJSST3"
+            appId: "1:365121286388:web:988306c20c71411e392ea1"
         };
-
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        // ===== FUNCIONES DE RENDERIZADO =====
-        function formatDate(ts) {
-            if (!ts) return '';
-            const d = ts.toDate();
-            return d.toLocaleString();
-        }
-
         function renderSites() {
-            db.collection('blocked_sites').orderBy('url').onSnapshot((snapshot) => {
-                const container = document.getElementById('sites-list');
-                container.innerHTML = '';
-                if (snapshot.empty) {
-                    container.innerHTML = '<p style="color:#888;">No hay sitios configurados. Agrega uno.</p>';
-                    return;
-                }
-                snapshot.forEach(doc => {
+            db.collection('blocked_sites').orderBy('url').onSnapshot(snap => {
+                const list = document.getElementById('sites-list');
+                list.innerHTML = '';
+                snap.forEach(doc => {
                     const data = doc.data();
                     const id = doc.id;
                     const div = document.createElement('div');
                     div.className = 'site';
-
-                    const urlSpan = document.createElement('span');
-                    urlSpan.className = 'url';
-                    urlSpan.textContent = data.url;
-
-                    const statusSpan = document.createElement('span');
-                    statusSpan.className = 'status';
-                    let statusText = data.blocked ? '🔴 Bloqueado' : '🟢 Desbloqueado';
+                    
+                    let status = data.blocked ? '🔴 Bloqueado' : '🟢 Libre';
                     const now = new Date();
                     if (data.unblock_until && data.unblock_until.toDate() > now) {
-                        statusText = `⏳ Desbloqueado hasta ${formatDate(data.unblock_until)}`;
+                        status = `⏳ Libre hasta ${data.unblock_until.toDate().toLocaleTimeString()}`;
                     }
-                    statusSpan.textContent = statusText;
 
-                    const btnGroup = document.createElement('div');
-                    btnGroup.className = 'btn-group';
-
-                    const btnToggle = document.createElement('button');
-                    btnToggle.textContent = data.blocked ? 'Desbloquear' : 'Bloquear';
-                    btnToggle.onclick = () => toggleBlock(id, !data.blocked);
-
-                    const btn5 = document.createElement('button');
-                    btn5.textContent = '5 min';
-                    btn5.onclick = () => unblockForMinutes(id, 5);
-
-                    const btn30 = document.createElement('button');
-                    btn30.textContent = '30 min';
-                    btn30.onclick = () => unblockForMinutes(id, 30);
-
-                    const btnDelete = document.createElement('button');
-                    btnDelete.textContent = '🗑️';
-                    btnDelete.className = 'danger';
-                    btnDelete.onclick = () => deleteSite(id);
-
-                    btnGroup.append(btnToggle, btn5, btn30, btnDelete);
-                    div.append(urlSpan, statusSpan, btnGroup);
-                    container.appendChild(div);
+                    div.innerHTML = `
+                        <span class="url">${data.url}</span>
+                        <span class="status">${status}</span>
+                        <button onclick="toggleBlock('${id}', ${!data.blocked})">${data.blocked ? 'Desbloquear' : 'Bloquear'}</button>
+                        <button onclick="setTimer('${id}', 5)" class="btn-time">5 min</button>
+                        <button onclick="setTimer('${id}', 30)" class="btn-time">30 min</button>
+                        <button onclick="deleteSite('${id}')" class="btn-danger">🗑️</button>
+                    `;
+                    list.appendChild(div);
                 });
             });
         }
 
-        async function addSite() {
-            const url = document.getElementById('newUrl').value.trim();
-            if (!url) return;
-            try {
-                await db.collection('blocked_sites').add({ url, blocked: true, unblock_until: null });
-                document.getElementById('newUrl').value = '';
-            } catch (e) { alert('Error: ' + e.message); }
+        async function addSite(url = null) {
+            const finalUrl = url || document.getElementById('newUrl').value.trim();
+            if (!finalUrl) return;
+            await db.collection('blocked_sites').add({ url: finalUrl, blocked: true, unblock_until: null });
+            if (!url) document.getElementById('newUrl').value = '';
         }
 
-        async function toggleBlock(id, blocked) {
-            try { await db.collection('blocked_sites').doc(id).update({ blocked, unblock_until: null }); }
-            catch (e) { alert('Error: ' + e.message); }
+        async function preLoadBlocklist() {
+            const list = [
+                'tiktok.com', 'tiktokv.com', 'tiktokcdn.com', 'byteoversea.com', 'vasing.com', 'muscdn.com',
+                'chatroulette.com', 'omegle.com', 'tinychat.com', 'bazoocam.org', 'emeraldchat.com', 'shagle.com',
+                'tinder.com', 'badoo.com', 'bumble.com', 'happn.com', 'grindr.com', 'meetic.es', 'pof.com'
+            ];
+            if(confirm("¿Cargar lista de TikTok, Citas y Chatroulette?")) {
+                for(let url of list) await addSite(url);
+                alert("Lista cargada.");
+            }
         }
 
-        async function unblockForMinutes(id, minutes) {
-            const until = new Date(Date.now() + minutes * 60 * 1000);
-            try {
-                await db.collection('blocked_sites').doc(id).update({
-                    blocked: true,
-                    unblock_until: firebase.firestore.Timestamp.fromDate(until)
-                });
-            } catch (e) { alert('Error: ' + e.message); }
+        async function toggleBlock(id, val) { await db.collection('blocked_sites').doc(id).update({ blocked: val, unblock_until: null }); }
+        async function setTimer(id, min) {
+            const until = new Date(Date.now() + min * 60000);
+            await db.collection('blocked_sites').doc(id).update({ blocked: false, unblock_until: firebase.firestore.Timestamp.fromDate(until) });
         }
+        async function deleteSite(id) { if(confirm("¿Borrar?")) await db.collection('blocked_sites').doc(id).delete(); }
 
-        async function deleteSite(id) {
-            if (!confirm('¿Eliminar?')) return;
-            try { await db.collection('blocked_sites').doc(id).delete(); }
-            catch (e) { alert('Error: ' + e.message); }
-        }
-
-        // ===== DESCARGA DE ARCHIVOS =====
         function downloadScript() {
-            const content = `import time
+            const content = `import time, os, sys, ctypes, subprocess
 from datetime import datetime
 import firebase_admin
 from firebase_admin import credentials, firestore
-import os
-import sys
-import ctypes
-import subprocess
 
-# === CONFIGURACIÓN ===
-HOSTS_PATH = r"C:\\Windows\\System32\\drivers\\etc\\hosts"
-REDIRECT = "127.0.0.1"
-SERVICE_ACCOUNT = "serviceAccountKey.json"
+HOSTS = r"C:\\Windows\\System32\\drivers\\etc\\hosts"
+CRED = "serviceAccountKey.json"
 
-def is_admin():
-    try: return ctypes.windll.shell32.IsUserAnAdmin()
-    except: return False
-
-if not is_admin():
+if not ctypes.windll.shell32.IsUserAnAdmin():
     ctypes.windll.shell32.ShellExecuteW(None, "runas", sys.executable, " ".join(sys.argv), None, 1)
     sys.exit()
 
-def flush_dns():
-    try: subprocess.run(["ipconfig", "/flushdns"], capture_output=True)
-    except: pass
-
 if not firebase_admin._apps:
-    if not os.path.exists(SERVICE_ACCOUNT):
-        print(f"ERROR: No se encuentra '{SERVICE_ACCOUNT}'")
-        sys.exit(1)
-    cred = credentials.Certificate(SERVICE_ACCOUNT)
-    firebase_admin.initialize_app(cred)
+    firebase_admin.initialize_app(credentials.Certificate(CRED))
 db = firestore.client()
 
-def update_hosts():
+def sync():
     docs = db.collection('blocked_sites').stream()
-    blocked_urls = []
+    blocked = []
     now = datetime.now()
     for doc in docs:
-        data = doc.to_dict()
-        url = data.get('url')
-        unblock_until = data.get('unblock_until')
-        if unblock_until and unblock_until > now: continue
-        if not data.get('blocked', True): continue
-        blocked_urls.append(url)
-
-    with open(HOSTS_PATH, 'r', encoding='utf-8') as f:
-        lines = f.readlines()
+        d = doc.to_dict()
+        url = d['url']
+        until = d.get('unblock_until')
+        if until and until.replace(tzinfo=None) > now: continue
+        if not d.get('blocked', True): continue
+        blocked.append(url)
     
-    new_lines = [l for l in lines if "# bloqueado_por_script" not in l and not any(u in l for u in blocked_urls)]
-    for url in blocked_urls:
-        new_lines.append(f"{REDIRECT} {url} # bloqueado_por_script\\n")
-        new_lines.append(f"{REDIRECT} www.{url} # bloqueado_por_script\\n")
-
-    with open(HOSTS_PATH, 'w', encoding='utf-8') as f:
-        f.writelines(new_lines)
-    flush_dns()
-    print(f"✅ Actualizado: {len(blocked_urls)} sitios bloqueados.")
+    with open(HOSTS, 'r') as f: lines = f.readlines()
+    new = [l for l in lines if "#muvn" not in l and not any(u in l for u in blocked)]
+    for u in blocked:
+        new.append(f"127.0.0.1 {u} #muvn\\n")
+        new.append(f"127.0.0.1 www.{u} #muvn\\n")
+    
+    with open(HOSTS, 'w') as f: f.writelines(new)
+    subprocess.run(["ipconfig", "/flushdns"], capture_output=True)
+    print(f"[{datetime.now().strftime('%H:%M:%S')}] Sincronizado. Bloqueados: {len(blocked)}")
 
 if __name__ == "__main__":
-    if "--once" in sys.argv:
-        update_hosts()
-    else:
-        print("=== MUVN CONTROL PARENTAL (ACTIVO) ===")
-        while True:
-            try: update_hosts()
-            except Exception as e: print(f"Error: {e}")
-            time.sleep(10)
+    while True:
+        try: sync()
+        except Exception as e: print(f"Error: {e}")
+        time.sleep(15)
 `;
             downloadFile(content, 'parental_control.py', 'text/x-python');
-        }
-
-        function downloadBat() {
-            const content = `@echo off
-title MUVN - Control Parental
-cd /d "%~dp0"
-echo 🔍 Verificando librerias...
-python -c "import firebase_admin" 2>nul
-if %errorlevel% neq 0 (
-    echo 📦 Instalando firebase-admin...
-    pip install firebase-admin
-)
-echo 🚀 Iniciando...
-python parental_control.py
-pause`;
-            downloadFile(content, 'run_control.bat', 'text/plain');
         }
 
         function downloadBrotherBat() {
             const content = `@echo off
 title MUVN - Actualizar Acceso
-cd /d "%~dp0"
-echo 🔄 Sincronizando permisos con el servidor...
-python -c "import firebase_admin" 2>nul
-if %errorlevel% neq 0 (
-    pip install firebase-admin >nul 2>&1
+set "CONFIG_FILE=%APPDATA%\\muvn_config.txt"
+
+:: Verificar si ya tenemos la ruta guardada
+if exist "%CONFIG_FILE%" (
+    set /p APP_DIR=<"%CONFIG_FILE%"
+) else (
+    echo ==========================================
+    echo  BIENVENIDO AL CONTROL PARENTAL MUVN
+    echo ==========================================
+    echo.
+    echo Por favor, pega la ruta de la carpeta donde
+    echo guardaste el archivo parental_control.py
+    echo (Ejemplo: C:\\Users\\Nombre\\Desktop\\Control)
+    echo.
+    set /p APP_DIR="Ruta: "
+    echo %APP_DIR% > "%CONFIG_FILE%"
 )
-python parental_control.py --once
+
+cd /d "%APP_DIR%"
+
+:: Verificar administrador
+net session >nul 2>&1
+if %errorlevel% neq 0 (
+    echo ⚠️  Ejecuta como ADMINISTRADOR para aplicar cambios.
+    pause & exit
+)
+
+echo 🔄 Sincronizando...
+python -c "import firebase_admin" 2>nul || pip install firebase-admin
+start /min pythonw parental_control.py
 echo.
-echo ✅ ¡Listo! Los permisos han sido actualizados.
-echo Ya puedes cerrar esta ventana.
+echo ✅ ¡Permisos actualizados!
+echo El script se quedara trabajando en segundo plano.
+echo Si el tiempo de permiso termina, se bloqueara solo.
 timeout /t 5`;
-            downloadFile(content, 'actualizar_bloqueo.bat', 'text/plain');
+            downloadFile(content, 'actualizar_acceso.bat', 'text/plain');
         }
 
-        function downloadFlush() {
-            const content = `@echo off
-ipconfig /flushdns
-echo ✅ DNS Limpiado.
-pause`;
-            downloadFile(content, 'flush_dns.bat', 'text/plain');
-        }
-
-        function downloadFile(content, filename, mimeType) {
-            const blob = new Blob([content], { type: mimeType });
-            const url = window.URL.createObjectURL(blob);
+        function downloadFile(c, f, m) {
+            const b = new Blob([c], { type: m });
+            const u = window.URL.createObjectURL(b);
             const a = document.createElement('a');
-            a.href = url; a.download = filename;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            window.URL.revokeObjectURL(url);
+            a.href = u; a.download = f;
+            document.body.appendChild(a); a.click();
+            document.body.removeChild(a); window.URL.revokeObjectURL(u);
         }
-
         renderSites();
     </script>
 </body>
