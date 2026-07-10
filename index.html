@@ -3,63 +3,69 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Control Parental AUTO - MUVN</title>
+    <title>Control Parental PRO - MUVN</title>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; padding: 20px; max-width: 900px; margin: auto; background: #f0f2f5; }
+        body { font-family: 'Segoe UI', sans-serif; padding: 20px; max-width: 900px; margin: auto; background: #f0f2f5; color: #333; }
         .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 20px; }
-        .site { border-bottom: 1px solid #eee; padding: 10px 0; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-        .url { font-weight: 600; flex: 1; min-width: 150px; }
-        .status { font-size: 0.9em; color: #666; width: 250px; }
-        button { padding: 8px 12px; border: none; border-radius: 6px; cursor: pointer; transition: 0.2s; font-weight: 500; }
+        h1 { color: #1a1a2e; text-align: center; }
+        h2 { border-bottom: 2px solid #eee; padding-bottom: 10px; margin-top: 0; }
+        
+        /* Acordeón Alfabético */
+        .letter-group { margin-bottom: 10px; border: 1px solid #ddd; border-radius: 8px; overflow: hidden; }
+        .letter-header { 
+            background: #fff; padding: 12px 20px; cursor: pointer; display: flex; 
+            justify-content: space-between; align-items: center; font-weight: bold; font-size: 1.2em;
+            transition: background 0.3s;
+        }
+        .letter-header:hover { background: #f8f9fa; }
+        .letter-content { display: none; padding: 0 20px; background: #fff; border-top: 1px solid #eee; }
+        .letter-group.active .letter-content { display: block; }
+        .letter-group.active .arrow { transform: rotate(180deg); }
+        .arrow { transition: transform 0.3s; }
+
+        .site { border-bottom: 1px solid #f0f0f0; padding: 12px 0; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+        .site:last-child { border-bottom: none; }
+        .url { font-weight: 600; flex: 1; min-width: 150px; color: #2c3e50; }
+        .status { font-size: 0.9em; color: #666; width: 220px; }
+        
+        button { padding: 8px 14px; border: none; border-radius: 6px; cursor: pointer; transition: 0.2s; font-weight: 500; }
         .btn-add { background: #27ae60; color: white; }
         .btn-danger { background: #e74c3c; color: white; }
         .btn-time { background: #3498db; color: white; }
         .btn-special { background: #8e44ad; color: white; }
-        input { padding: 10px; border: 1px solid #ddd; border-radius: 6px; width: 60%; }
-        .instructions { background: #fff3e0; padding: 15px; border-radius: 8px; border-left: 5px solid #ff9800; margin-top: 15px; }
+        
+        textarea { width: 100%; height: 80px; padding: 10px; border: 1px solid #ddd; border-radius: 8px; margin-bottom: 10px; font-family: inherit; resize: vertical; }
+        .instructions { background: #e3f2fd; padding: 15px; border-radius: 8px; border-left: 5px solid #2196f3; margin-top: 15px; }
         .file-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin: 15px 0; }
         .file-item { background: #fff; padding: 15px; border-radius: 8px; text-align: center; border: 1px solid #ddd; }
     </style>
 </head>
 <body>
-    <h1>🤖 Control Parental MUVN v6 (Auto-Configurable)</h1>
+    <h1>🚀 MUVN Parental Control v7</h1>
     
     <div class="card">
-        <h2>➕ Gestión de Sitios</h2>
-        <div style="display:flex; gap:10px; margin-bottom:20px;">
-            <input id="newUrl" placeholder="ej. tiktok.com" />
-            <button onclick="addSite()" class="btn-add">Agregar Sitio</button>
-            <button onclick="preLoadBlocklist()" class="btn-special">Cargar Lista Completa</button>
+        <h2>➕ Carga Masiva</h2>
+        <p style="font-size: 0.9em; color: #666;">Pega los sitios separados por comas o líneas (ej: tiktok.com, badoo.com):</p>
+        <textarea id="bulkUrls" placeholder="tiktok.com, tinder.com, bazoocam.org..."></textarea>
+        <div style="display:flex; gap:10px;">
+            <button onclick="addBulkSites()" class="btn-add">Bloquear Lista Masiva</button>
+            <button onclick="preLoadBlocklist()" class="btn-special">Cargar Pack TikTok/Citas</button>
         </div>
-        <div id="sites-list"></div>
     </div>
 
     <div class="card">
-        <h2>⬇️ Archivos de Configuración Automática</h2>
-        <p>Usa estos archivos para que el sistema se configure solo y arranque siempre con la PC.</p>
+        <h2>📋 Sitios Gestionados</h2>
+        <div id="alphabetical-list"></div>
+    </div>
+
+    <div class="card">
+        <h2>⬇️ Archivos del Sistema</h2>
         <div class="file-grid">
-            <div class="file-item">
-                <strong>🐍 Motor</strong><br><br>
-                <button onclick="downloadScript()" class="btn-time">parental_control.py</button>
-            </div>
-            <div class="file-item">
-                <strong>👻 Lanzador</strong><br><br>
-                <button onclick="downloadVbs()" class="btn-special">activar_silencioso.vbs</button>
-            </div>
-            <div class="file-item" style="background: #fff3e0; border-color: #ffcc80;">
-                <strong>⚡ Auto-Programador</strong><br><br>
-                <button onclick="downloadAutoTask()" class="btn-special" style="background: #e67e22;">programar_inicio.bat</button>
-            </div>
-        </div>
-        <div class="instructions">
-            <strong>🚀 Cómo activar el Inicio Automático:</strong>
-            <ol>
-                <li>Descarga los 3 archivos en la misma carpeta.</li>
-                <li>Ejecuta <strong>programar_inicio.bat</strong> como administrador.</li>
-                <li>¡Listo! El sistema creará la tarea en Windows para que el control se active solo al encender la PC, sin ventanas y de forma invisible.</li>
-            </ol>
+            <div class="file-item"><strong>🐍 Motor</strong><br><button onclick="downloadScript()" class="btn-time">parental_control.py</button></div>
+            <div class="file-item"><strong>👻 Lanzador</strong><br><button onclick="downloadVbs()" class="btn-special">activar_silencioso.vbs</button></div>
+            <div class="file-item"><strong>⚡ Auto-Task</strong><br><button onclick="downloadAutoTask()" class="btn-special" style="background: #e67e22;">programar_inicio.bat</button></div>
         </div>
     </div>
 
@@ -77,42 +83,70 @@
 
         function renderSites() {
             db.collection('blocked_sites').orderBy('url').onSnapshot(snap => {
-                const list = document.getElementById('sites-list');
-                list.innerHTML = '';
+                const container = document.getElementById('alphabetical-list');
+                container.innerHTML = '';
+                
+                const groups = {};
                 snap.forEach(doc => {
                     const data = doc.data();
-                    const id = doc.id;
-                    const div = document.createElement('div');
-                    div.className = 'site';
-                    let status = data.blocked ? '🔴 Bloqueado' : '🟢 Libre';
-                    const now = new Date();
-                    if (data.unblock_until && data.unblock_until.toDate() > now) {
-                        status = `⏳ Libre hasta ${data.unblock_until.toDate().toLocaleTimeString()}`;
-                    }
-                    div.innerHTML = `
-                        <span class="url">${data.url}</span>
-                        <span class="status">${status}</span>
-                        <button onclick="toggleBlock('${id}', ${!data.blocked})">${data.blocked ? 'Desbloquear' : 'Bloquear'}</button>
-                        <button onclick="setTimer('${id}', 5)" class="btn-time">5 min</button>
-                        <button onclick="setTimer('${id}', 30)" class="btn-time">30 min</button>
-                        <button onclick="deleteSite('${id}')" class="btn-danger">🗑️</button>
-                    `;
-                    list.appendChild(div);
+                    const letter = data.url.charAt(0).toUpperCase();
+                    if (!groups[letter]) groups[letter] = [];
+                    groups[letter].push({ id: doc.id, ...data });
+                });
+
+                Object.keys(groups).sort().forEach(letter => {
+                    const groupDiv = document.createElement('div');
+                    groupDiv.className = 'letter-group';
+                    
+                    const header = document.createElement('div');
+                    header.className = 'letter-header';
+                    header.innerHTML = `<span>Letra ${letter} (${groups[letter].length})</span> <span class="arrow">▼</span>`;
+                    header.onclick = () => groupDiv.classList.toggle('active');
+
+                    const content = document.createElement('div');
+                    content.className = 'letter-content';
+
+                    groups[letter].forEach(site => {
+                        const siteDiv = document.createElement('div');
+                        siteDiv.className = 'site';
+                        let status = site.blocked ? '🔴 Bloqueado' : '🟢 Libre';
+                        const now = new Date();
+                        if (site.unblock_until && site.unblock_until.toDate() > now) {
+                            status = `⏳ Libre hasta ${site.unblock_until.toDate().toLocaleTimeString()}`;
+                        }
+
+                        siteDiv.innerHTML = `
+                            <span class="url">${site.url}</span>
+                            <span class="status">${status}</span>
+                            <button onclick="toggleBlock('${site.id}', ${!site.blocked})">${site.blocked ? 'Desbloquear' : 'Bloquear'}</button>
+                            <button onclick="setTimer('${site.id}', 5)" class="btn-time">5 min</button>
+                            <button onclick="deleteSite('${site.id}')" class="btn-danger">🗑️</button>
+                        `;
+                        content.appendChild(siteDiv);
+                    });
+
+                    groupDiv.appendChild(header);
+                    groupDiv.appendChild(content);
+                    container.appendChild(groupDiv);
                 });
             });
         }
 
-        async function addSite(url = null) {
-            const finalUrl = url || document.getElementById('newUrl').value.trim();
-            if (!finalUrl) return;
-            await db.collection('blocked_sites').add({ url: finalUrl, blocked: true, unblock_until: null });
-            if (!url) document.getElementById('newUrl').value = '';
+        async function addBulkSites() {
+            const text = document.getElementById('bulkUrls').value;
+            const urls = text.split(/[,\n]/).map(u => u.trim()).filter(u => u.length > 0);
+            if (urls.length === 0) return;
+            for (let url of urls) {
+                await db.collection('blocked_sites').add({ url, blocked: true, unblock_until: null });
+            }
+            document.getElementById('bulkUrls').value = '';
+            alert(`${urls.length} sitios agregados.`);
         }
 
         async function preLoadBlocklist() {
-            const list = ['tiktok.com', 'tiktokv.com', 'tiktokcdn.com', 'chatroulette.com', 'bazoocam.org', 'omegle.com', 'tinder.com'];
-            for(let url of list) await addSite(url);
-            alert("Lista cargada.");
+            const list = ['tiktok.com', 'tiktokv.com', 'tiktokcdn.com', 'chatroulette.com', 'bazoocam.org', 'omegle.com', 'tinder.com', 'badoo.com', 'bumble.com'];
+            for(let url of list) await db.collection('blocked_sites').add({ url, blocked: true, unblock_until: null });
+            alert("Pack cargado.");
         }
 
         async function toggleBlock(id, val) { await db.collection('blocked_sites').doc(id).update({ blocked: val, unblock_until: null }); }
@@ -174,32 +208,8 @@ Set WshShell = Nothing`;
         function downloadAutoTask() {
             const content = `@echo off
 cd /d "%~dp0"
-set "TASK_NAME=MUVN_Control"
-set "SCRIPT_PATH=%~dp0activar_silencioso.vbs"
-
-echo ==========================================
-echo  PROGRAMADOR AUTOMATICO MUVN
-echo ==========================================
-echo.
-
-:: Verificar administrador
-net session >nul 2>&1
-if %errorlevel% neq 0 (
-    echo ⚠️  EJECUTA ESTE ARCHIVO COMO ADMINISTRADOR.
-    pause & exit
-)
-
-echo 📦 Instalando dependencias...
-pip install firebase-admin --quiet
-
-echo ⚙️  Creando tarea programada...
-schtasks /create /f /tn "%TASK_NAME%" /tr "wscript.exe \\"%SCRIPT_PATH%\\"" /sc onlogon /rl highest
-
-echo.
-echo ✅ ¡LISTO! El control se activara solo al encender la PC.
-echo Iniciando ahora mismo de forma invisible...
-wscript.exe "%SCRIPT_PATH%"
-timeout /t 5
+schtasks /create /f /tn "MUVN_Control" /tr "wscript.exe \\"%~dp0activar_silencioso.vbs\\"" /sc onlogon /rl highest
+wscript.exe "%~dp0activar_silencioso.vbs"
 exit`;
             downloadFile(content, 'programar_inicio.bat', 'text/plain');
         }
