@@ -3,417 +3,375 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
-    <!-- --- CONFIGURACIÓN PARA WHATSAPP / REDES SOCIALES --- -->
-    <title>MUVN - Registro de Cuidados</title>
-    <meta name="description" content="Herramienta exclusiva para el equipo de cuidadores.">
-
-    <!-- Open Graph (Lo que ve WhatsApp/Facebook) -->
-    <meta property="og:type" content="website">
-    <meta property="og:title" content="MUVN - Equipo de Cuidados">
-    <meta property="og:description" content="Cuidar con el corazón hace la diferencia. ❤️ Gracias por tu dedicación diaria.">
-    <meta property="og:image" content="https://raw.githubusercontent.com/jesusvn1993mplvt3-ai/proyecto_cuidadores_MUVN/refs/heads/main/MUVN.jpg">
-    <meta property="og:image:width" content="1200">
-    <meta property="og:image:height" content="630">
-
-    <!-- Twitter Card (Opcional, para mejor compatibilidad) -->
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="MUVN - Equipo de Cuidados">
-    <meta name="twitter:description" content="Cuidar con el corazón hace la diferencia. ❤️ Gracias por tu dedicación diaria.">
-    <meta name="twitter:image" content="https://raw.githubusercontent.com/jesusvn1993mplvt3-ai/proyecto_cuidadores_MUVN/refs/heads/main/MUVN.jpg">
-    
-    <!-- --- LIBRERÍAS (NO TOCAR) --- -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
-
+    <title>Control Parental - MUVN</title>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
     <style>
-        /* Animaciones suaves */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 20px;
+            max-width: 700px;
+            margin: auto;
+            background: #f5f7fa;
         }
-        .animate-fade-in {
-            animation: fadeIn 0.5s ease-out forwards;
+        h1, h2 { color: #1a1a2e; }
+        .card {
+            background: white;
+            padding: 15px 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .site {
+            border-bottom: 1px solid #e0e0e0;
+            padding: 12px 0;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px;
+        }
+        .site:last-child { border-bottom: none; }
+        .url { font-weight: 600; flex: 1 1 120px; }
+        .status { font-size: 0.9em; color: #555; flex: 1 1 150px; }
+        button {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 6px;
+            background: #2d4059;
+            color: white;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: 0.2s;
+        }
+        button:hover { background: #1a2a3a; }
+        button.danger { background: #e74c3c; }
+        button.danger:hover { background: #c0392b; }
+        button.success { background: #27ae60; }
+        button.success:hover { background: #1e8449; }
+        input {
+            padding: 10px;
+            width: 70%;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 1em;
+        }
+        .btn-group { display: flex; flex-wrap: wrap; gap: 5px; }
+        .download-btn {
+            background: #3498db;
+            padding: 12px 24px;
+            font-size: 1.1em;
+            margin-top: 10px;
+        }
+        .download-btn:hover { background: #2980b9; }
+        .instructions {
+            background: #fef9e7;
+            border-left: 5px solid #f1c40f;
+            padding: 10px 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+        .badge {
+            display: inline-block;
+            background: #2d4059;
+            color: white;
+            border-radius: 20px;
+            padding: 2px 12px;
+            font-size: 0.8em;
+            margin-left: 8px;
         }
     </style>
 </head>
-<body class="bg-blue-50 text-gray-800 font-sans pb-20">
+<body>
+    <h1>🚀 Control Parental</h1>
+    <div class="card">
+        <h2>📋 Sitios gestionados</h2>
+        <div id="sites-list"></div>
+    </div>
 
-    <div id="root"></div>
+    <div class="card">
+        <h2>➕ Agregar nuevo sitio</h2>
+        <input id="newUrl" placeholder="ej. twitter.com, youtube.com" />
+        <button onclick="addSite()" class="success">Agregar</button>
+    </div>
 
-    <!-- --- CÓDIGO DE LA APP --- -->
-    <script type="text/babel">
+    <div class="card" style="background: #eaf2f8;">
+        <h2>⬇️ Descargar script para la laptop</h2>
+        <p>Este script se ejecutará en segundo plano y actualizará automáticamente el archivo <code>hosts</code> según lo que configures aquí.</p>
+        <button onclick="downloadScript()" class="download-btn">📥 Descargar parental_control.py</button>
+        <div class="instructions">
+            <strong>📝 Instrucciones:</strong>
+            <ol>
+                <li>Descarga el script y colócalo en una carpeta de la laptop.</li>
+                <li>Descarga la clave de servicio (Service Account JSON) desde <a href="https://console.firebase.google.com/project/muvn-72b44/settings/serviceaccounts/adminsdk" target="_blank">Firebase Console → Configuración → Cuentas de servicio</a>.</li>
+                <li>Renombra el archivo de clave como <code>serviceAccountKey.json</code> y ponlo en la <strong>misma carpeta</strong> que el script.</li>
+                <li>Ejecuta el script <strong>como administrador</strong> (clic derecho → Ejecutar como administrador) para que pueda modificar el archivo hosts.</li>
+                <li>¡Listo! Se actualizará cada 10 segundos.</li>
+            </ol>
+        </div>
+    </div>
 
-        // --- ICONOS ---
-        const Icons = {
-            Sun: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>,
-            Moon: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>,
-            User: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>,
-            CheckCircle: ({className}) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>,
-            Clock: () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>,
-            Send: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>,
-            Trash2: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>,
-            Activity: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>,
-            AlertCircle: () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>,
-            ClipboardList: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M12 11h4"/><path d="M12 16h4"/><path d="M8 11h.01"/><path d="M8 16h.01"/></svg>,
-            Heart: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+    <script>
+        // ===== CONFIGURACIÓN DE FIREBASE (TÚ YA LA TIENES) =====
+        const firebaseConfig = {
+            apiKey: "AIzaSyBvQxckDVA4UivGKwQU2da2fBMolOH8UDw",
+            authDomain: "muvn-72b44.firebaseapp.com",
+            projectId: "muvn-72b44",
+            storageBucket: "muvn-72b44.firebasestorage.app",
+            messagingSenderId: "365121286388",
+            appId: "1:365121286388:web:988306c20c71411e392ea1",
+            measurementId: "G-N1GGLJSST3"
         };
 
-        // --- DATOS DE EJEMPLO ---
-        const CAREGIVERS = [
-            "Ana Martínez", "Carlos Velázquez", "Beatriz Solís", "David López", "Elena Ramírez"
-        ];
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
 
-        const PATIENTS = [
-            {
-                id: 'p1',
-                name: "Don Roberto (Diabetes/Hipertensión)",
-                details: "Insulinodependiente. Riesgo de hipoglucemia nocturna.",
-                tasks: {
-                dia: [
-                    { id: 't1_d1', text: "Toma de Glucosa (Ayunas)", type: "vital" },
-                    { id: 't1_d2', text: "Administrar Insulina (NPH 15 uds)", type: "med" },
-                    { id: 't1_d3', text: "Desayuno (Dieta baja en azúcar)", type: "food" },
-                    { id: 't1_d4', text: "Toma de Presión Arterial", type: "vital" },
-                    { id: 't1_d5', text: "Administrar Metformina 850mg", type: "med" }
-                ],
-                noche: [
-                    { id: 't1_n1', text: "Cena ligera (7:00 PM)", type: "food" },
-                    { id: 't1_n2', text: "Revisión de pañal (Incontinencia leve)", type: "check", note: "Asegurar que esté seco antes de dormir." },
-                    { id: 't1_n3', text: "Administrar Insulina Nocturna", type: "med" },
-                    { id: 't1_n4', text: "Revisar temperatura habitación (Frío)", type: "env", note: "Si hace frío, agregar manta extra. Despertar a las 3 AM para baño." }
-                ]
+        // ===== CREAR COLECCIÓN SI NO EXISTE (con un sitio de ejemplo) =====
+        async function ensureCollection() {
+            try {
+                const snapshot = await db.collection('blocked_sites').limit(1).get();
+                if (snapshot.empty) {
+                    // Agregar un documento de ejemplo
+                    await db.collection('blocked_sites').add({
+                        url: 'facebook.com',
+                        blocked: true,
+                        unblock_until: null
+                    });
+                    console.log('Colección creada con sitio de ejemplo.');
                 }
-            },
-            {
-                id: 'p2',
-                name: "Doña María (Alzheimer)",
-                details: "Desorientación espacial. No dejar sola.",
-                tasks: {
-                dia: [
-                    { id: 'p2_d1', text: "Administrar Memantina 10mg", type: "med" },
-                    { id: 'p2_d2', text: "Aseo personal asistido", type: "hygiene" },
-                    { id: 'p2_d3', text: "Ejercicios cognitivos (Memoria)", type: "activity" },
-                    { id: 'p2_d4', text: "Hidratación (Vaso de agua)", type: "food" }
-                ],
-                noche: [
-                    { id: 'p2_n1', text: "Administrar Quetiapina (Si está agitada)", type: "med" },
-                    { id: 'p2_n2', text: "Subir barandales de la cama", type: "safety", note: "Riesgo de caídas al intentar levantarse." },
-                    { id: 'p2_n3', text: "Revisión de sueño cada 2 horas", type: "check" },
-                    { id: 'p2_n4', text: "Revisión de pañal (Cambio nocturno)", type: "hygiene", note: "Piel muy sensible, usar crema protectora." }
-                ]
-                }
-            },
-            {
-                id: 'p3',
-                name: "Sr. Pedro (Post-operatorio Cadera)",
-                details: "Movilidad reducida. Riesgo de escaras.",
-                tasks: {
-                dia: [
-                    { id: 'p3_d1', text: "Curación de herida quirúrgica", type: "nursing" },
-                    { id: 'p3_d2', text: "Analgésico (Tramadol)", type: "med" },
-                    { id: 'p3_d3', text: "Terapia física (Movimiento suave)", type: "activity" },
-                    { id: 'p3_d4', text: "Cambio de posición (Cada 3 horas)", type: "check" }
-                ],
-                noche: [
-                    { id: 'p3_n1', text: "Analgésico Nocturno", type: "med" },
-                    { id: 'p3_n2', text: "Cambio de posición (Lado Izquierdo)", type: "check" },
-                    { id: 'p3_n3', text: "Cambio de posición (Boca arriba)", type: "check" },
-                    { id: 'p3_n4', text: "Revisar orina en bolsa recolectora", type: "check" }
-                ]
-                }
+            } catch (e) {
+                console.error('Error al verificar colección:', e);
             }
-        ];
+        }
+        ensureCollection();
 
-        // --- COMPONENTE PRINCIPAL ---
-        function App() {
-            const [caregiver, setCaregiver] = React.useState("");
-            const [shift, setShift] = React.useState("");
-            const [patientId, setPatientId] = React.useState("");
-            const [records, setRecords] = React.useState({});
-
-            React.useEffect(() => {
-                const saved = localStorage.getItem('careApp_data');
-                if (saved) {
-                    const parsed = JSON.parse(saved);
-                    setCaregiver(parsed.caregiver || "");
-                    setShift(parsed.shift || "");
-                    setPatientId(parsed.patientId || "");
-                    setRecords(parsed.records || {});
-                }
-            }, []);
-
-            React.useEffect(() => {
-                const dataToSave = { caregiver, shift, patientId, records };
-                localStorage.setItem('careApp_data', JSON.stringify(dataToSave));
-            }, [caregiver, shift, patientId, records]);
-
-            const handleTaskCheck = (taskId) => {
-                const now = new Date();
-                const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
-                const dateString = now.toLocaleDateString([], {day: 'numeric', month: 'short'});
-
-                setRecords(prev => {
-                    const current = prev[taskId] || {};
-                    if (current.checked) {
-                        return { ...prev, [taskId]: { ...current, checked: false, time: null } };
-                    } else {
-                        return { ...prev, [taskId]: { ...current, checked: true, time: `${dateString}, ${timeString}` } };
-                    }
-                });
-            };
-
-            const handleTaskNote = (taskId, text) => {
-                setRecords(prev => ({
-                    ...prev,
-                    [taskId]: { ...(prev[taskId] || {}), note: text }
-                }));
-            };
-
-            const resetAll = () => {
-                if(window.confirm("¿Estás seguro de borrar todos los datos del turno actual?")) {
-                    setCaregiver("");
-                    setShift("");
-                    setPatientId("");
-                    setRecords({});
-                    localStorage.removeItem('careApp_data');
-                }
-            };
-
-            const generateWhatsAppLink = () => {
-                if (!caregiver || !shift || !patientId) {
-                    alert("Por favor completa la información básica antes de enviar.");
-                    return;
-                }
-
-                const patient = PATIENTS.find(p => p.id === patientId);
-                const taskList = patient.tasks[shift] || [];
-                
-                let message = `📋 *REPORTE DE CUIDADO DIARIO - MUVN*\n`;
-                message += `📅 *Fecha:* ${new Date().toLocaleDateString()}\n`;
-                message += `👤 *Cuidador:* ${caregiver}\n`;
-                message += `🌗 *Turno:* ${shift === 'dia' ? '☀️ Mañana/Tarde' : '🌙 Noche'}\n`;
-                message += `👴 *Paciente:* ${patient.name}\n\n`;
-                message += `✅ *ACTIVIDADES REALIZADAS:*\n`;
-                
-                let completedCount = 0;
-                taskList.forEach(task => {
-                    const rec = records[task.id];
-                    if (rec && rec.checked) {
-                        completedCount++;
-                        message += `🔹 *${task.text}*\n`;
-                        message += `   🕒 Hora: ${rec.time}\n`;
-                        if (rec.note) message += `   📝 Obs: ${rec.note}\n`;
-                    }
-                });
-
-                if (completedCount === 0) message += `   (Ninguna actividad registrada aún)\n`;
-
-                message += `\n⚠️ *PENDIENTES / NO REALIZADOS:*\n`;
-                taskList.forEach(task => {
-                    const rec = records[task.id];
-                    if (!rec || !rec.checked) {
-                        message += `🔸 ${task.text}`;
-                        if (rec && rec.note) message += ` (Obs: ${rec.note})`;
-                        message += `\n`;
-                    }
-                });
-
-                const encodedMsg = encodeURIComponent(message);
-                window.open(`https://wa.me/524451586270?text=${encodedMsg}`, '_blank');
-            };
-
-            const currentPatient = PATIENTS.find(p => p.id === patientId);
-            const currentTasks = (currentPatient && shift) ? currentPatient.tasks[shift] : [];
-
-            return (
-                <div className="max-w-3xl mx-auto">
-                    {/* HEADER */}
-                    <header className="bg-sky-600 text-white p-4 shadow-md sticky top-0 z-10 rounded-b-xl">
-                        <div className="flex justify-between items-center">
-                            <div>
-                                <h1 className="text-xl font-bold flex items-center gap-2">
-                                    <Icons.Activity />
-                                    MUVN
-                                </h1>
-                                <p className="text-xs text-sky-100 font-medium">Registro de Cuidados</p>
-                            </div>
-                            <button 
-                                onClick={resetAll}
-                                className="bg-rose-500 hover:bg-rose-600 text-white p-2 rounded-lg text-xs flex items-center gap-1 transition-colors shadow-sm"
-                            >
-                                <Icons.Trash2 />
-                                Reiniciar
-                            </button>
-                        </div>
-                    </header>
-
-                    {/* MENSAJE MOTIVACIONAL INTERNO */}
-                    <div className="mx-4 mt-4 bg-white p-3 rounded-lg border border-sky-100 shadow-sm flex items-center gap-3">
-                         <div className="p-2 bg-sky-100 rounded-full text-sky-600">
-                            <Icons.Heart />
-                         </div>
-                         <div>
-                            <p className="text-sm text-gray-700 italic">"Cuidar con el corazón hace la diferencia."</p>
-                            <p className="text-xs text-gray-500 font-semibold">Gracias por tu dedicación diaria.</p>
-                         </div>
-                    </div>
-
-                    <main className="p-4 space-y-6">
-
-                        {/* 1. SELECCIÓN DE CUIDADOR */}
-                        <section className="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
-                            <label className="block text-sm font-semibold text-gray-600 mb-2 flex items-center gap-2">
-                                <Icons.User />
-                                Selecciona Cuidador
-                            </label>
-                            <select 
-                                value={caregiver} 
-                                onChange={(e) => setCaregiver(e.target.value)}
-                                className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-lg focus:ring-2 focus:ring-sky-500 outline-none"
-                            >
-                                <option value="">-- Elige tu nombre --</option>
-                                {CAREGIVERS.map(c => <option key={c} value={c}>{c}</option>)}
-                            </select>
-                        </section>
-
-                        {/* 2. SELECCIÓN DE TURNO */}
-                        <section className="grid grid-cols-2 gap-4">
-                            <button 
-                                onClick={() => setShift('dia')}
-                                className={`p-4 rounded-xl border-2 flex flex-col items-center justify-center gap-2 transition-all ${shift === 'dia' ? 'border-amber-400 bg-amber-50 text-amber-700' : 'border-gray-200 bg-white text-gray-400'}`}
-                            >
-                                <div className={shift === 'dia' ? 'text-amber-500' : ''}>
-                                    <Icons.Sun />
-                                </div>
-                                <span className="font-bold">Turno Día</span>
-                            </button>
-                            <button 
-                                onClick={() => setShift('noche')}
-                                className={`p-4 rounded-xl border-2 flex flex-col items-center justify-center gap-2 transition-all ${shift === 'noche' ? 'border-indigo-500 bg-indigo-50 text-indigo-700' : 'border-gray-200 bg-white text-gray-400'}`}
-                            >
-                                <div className={shift === 'noche' ? 'text-indigo-600' : ''}>
-                                    <Icons.Moon />
-                                </div>
-                                <span className="font-bold">Turno Noche</span>
-                            </button>
-                        </section>
-
-                        {/* 3. SELECCIÓN DE PACIENTE */}
-                        <section className="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
-                           <label className="block text-sm font-semibold text-gray-600 mb-2 flex items-center gap-2">
-                                <Icons.ClipboardList />
-                                Selecciona Paciente
-                            </label>
-                            <div className="space-y-2">
-                                {PATIENTS.map(p => (
-                                <button
-                                    key={p.id}
-                                    onClick={() => setPatientId(p.id)}
-                                    className={`w-full text-left p-3 rounded-lg border transition-all ${patientId === p.id ? 'border-sky-500 bg-sky-50 ring-1 ring-sky-500' : 'border-gray-200 hover:bg-gray-50'}`}
-                                >
-                                    <div className="font-bold text-gray-800">{p.name}</div>
-                                    {patientId === p.id && (
-                                    <div className="text-xs text-sky-600 mt-1">{p.details}</div>
-                                    )}
-                                </button>
-                                ))}
-                            </div>
-                        </section>
-
-                        {/* 4. LISTA DE TAREAS DINÁMICAS */}
-                        {caregiver && shift && patientId && (
-                            <section className="space-y-4 animate-fade-in">
-                                <div className="flex items-center gap-2 mb-2">
-                                    <h2 className="text-lg font-bold text-gray-800">
-                                        Lista de Obligaciones ({shift === 'dia' ? 'Día' : 'Noche'})
-                                    </h2>
-                                    <span className="bg-sky-100 text-sky-800 text-xs px-2 py-1 rounded-full font-medium">
-                                        {currentTasks.length} Tareas
-                                    </span>
-                                </div>
-
-                                {currentTasks.map((task) => {
-                                    const record = records[task.id] || {};
-                                    const isChecked = record.checked || false;
-
-                                    let borderClass = "border-gray-200";
-                                    if (task.type === 'med') borderClass = "border-l-4 border-l-rose-400";
-                                    if (task.type === 'vital') borderClass = "border-l-4 border-l-emerald-400";
-                                    if (task.type === 'check') borderClass = "border-l-4 border-l-purple-400";
-                                    if (task.type === 'env') borderClass = "border-l-4 border-l-sky-400";
-
-                                    return (
-                                        <div key={task.id} className={`bg-white rounded-lg shadow-sm border p-4 ${borderClass} transition-all ${isChecked ? 'bg-gray-50' : ''}`}>
-                                            <div className="flex items-start gap-3">
-                                                <button
-                                                    onClick={() => handleTaskCheck(task.id)}
-                                                    className={`mt-1 flex-shrink-0 w-8 h-8 rounded-full border-2 flex items-center justify-center transition-all ${isChecked ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-gray-300 text-transparent hover:border-emerald-400'}`}
-                                                >
-                                                    <Icons.CheckCircle className={isChecked ? "opacity-100" : "opacity-0"} />
-                                                </button>
-                                                
-                                                <div className="flex-1">
-                                                    <h3 className={`font-medium text-gray-800 text-lg leading-tight ${isChecked ? 'line-through text-gray-400' : ''}`}>
-                                                        {task.text}
-                                                    </h3>
-                                                    
-                                                    {task.note && (
-                                                        <div className="mt-1 flex items-start gap-1 text-sm text-amber-600 bg-amber-50 p-2 rounded">
-                                                            <div className="mt-0.5"><Icons.AlertCircle /></div>
-                                                            <span>{task.note}</span>
-                                                        </div>
-                                                    )}
-
-                                                    {isChecked && record.time && (
-                                                        <div className="mt-2 inline-flex items-center gap-1 text-xs font-bold text-emerald-700 bg-emerald-100 px-2 py-1 rounded">
-                                                            <Icons.Clock />
-                                                            Completado: {record.time}
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            </div>
-
-                                            <div className="mt-3 pl-11">
-                                                <textarea
-                                                    placeholder="Observaciones..."
-                                                    value={record.note || ""}
-                                                    onChange={(e) => handleTaskNote(task.id, e.target.value)}
-                                                    className="w-full text-sm p-2 border border-gray-200 rounded-md focus:ring-1 focus:ring-sky-400 outline-none resize-none bg-gray-50 focus:bg-white"
-                                                    rows={2}
-                                                />
-                                            </div>
-                                        </div>
-                                    );
-                                })}
-                            </section>
-                        )}
-
-                    </main>
-
-                    {/* FOOTER */}
-                    {caregiver && shift && patientId && (
-                        <div className="fixed bottom-0 left-0 w-full bg-white border-t border-gray-200 p-4 shadow-lg z-20">
-                            <div className="max-w-3xl mx-auto">
-                                <button
-                                    onClick={generateWhatsAppLink}
-                                    className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-6 rounded-xl shadow-md flex items-center justify-center gap-2 text-lg transition-transform active:scale-95"
-                                >
-                                    <Icons.Send />
-                                    Enviar Reporte
-                                </button>
-                            </div>
-                        </div>
-                    )}
-                </div>
-            );
+        // ===== FUNCIONES DE RENDERIZADO Y MANIPULACIÓN =====
+        function formatDate(ts) {
+            if (!ts) return '';
+            const d = ts.toDate();
+            return d.toLocaleString();
         }
 
-        const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(<App />);
+        function renderSites() {
+            db.collection('blocked_sites').orderBy('url').onSnapshot((snapshot) => {
+                const container = document.getElementById('sites-list');
+                container.innerHTML = '';
+                if (snapshot.empty) {
+                    container.innerHTML = '<p style="color:#888;">No hay sitios configurados. Agrega uno.</p>';
+                    return;
+                }
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    const id = doc.id;
+                    const div = document.createElement('div');
+                    div.className = 'site';
+
+                    const urlSpan = document.createElement('span');
+                    urlSpan.className = 'url';
+                    urlSpan.textContent = data.url;
+
+                    const statusSpan = document.createElement('span');
+                    statusSpan.className = 'status';
+                    let statusText = data.blocked ? '🔴 Bloqueado' : '🟢 Desbloqueado';
+                    const now = new Date();
+                    if (data.unblock_until && data.unblock_until.toDate() > now) {
+                        statusText = `⏳ Desbloqueado hasta ${formatDate(data.unblock_until)}`;
+                    }
+                    statusSpan.textContent = statusText;
+
+                    const btnGroup = document.createElement('div');
+                    btnGroup.className = 'btn-group';
+
+                    const btnToggle = document.createElement('button');
+                    btnToggle.textContent = data.blocked ? 'Desbloquear' : 'Bloquear';
+                    btnToggle.onclick = () => toggleBlock(id, !data.blocked);
+
+                    const btn5 = document.createElement('button');
+                    btn5.textContent = '5 min';
+                    btn5.onclick = () => unblockForMinutes(id, 5);
+
+                    const btn10 = document.createElement('button');
+                    btn10.textContent = '10 min';
+                    btn10.onclick = () => unblockForMinutes(id, 10);
+
+                    const btn30 = document.createElement('button');
+                    btn30.textContent = '30 min';
+                    btn30.onclick = () => unblockForMinutes(id, 30);
+
+                    const btnDelete = document.createElement('button');
+                    btnDelete.textContent = '🗑️';
+                    btnDelete.className = 'danger';
+                    btnDelete.onclick = () => deleteSite(id);
+
+                    btnGroup.append(btnToggle, btn5, btn10, btn30, btnDelete);
+                    div.append(urlSpan, statusSpan, btnGroup);
+                    container.appendChild(div);
+                });
+            });
+        }
+
+        // Funciones de escritura
+        async function addSite() {
+            const url = document.getElementById('newUrl').value.trim();
+            if (!url) return;
+            try {
+                await db.collection('blocked_sites').add({
+                    url: url,
+                    blocked: true,
+                    unblock_until: null
+                });
+                document.getElementById('newUrl').value = '';
+            } catch (e) {
+                alert('Error al agregar: ' + e.message);
+            }
+        }
+
+        async function toggleBlock(id, blocked) {
+            try {
+                await db.collection('blocked_sites').doc(id).update({
+                    blocked: blocked,
+                    unblock_until: null
+                });
+            } catch (e) {
+                alert('Error: ' + e.message);
+            }
+        }
+
+        async function unblockForMinutes(id, minutes) {
+            const until = new Date(Date.now() + minutes * 60 * 1000);
+            try {
+                await db.collection('blocked_sites').doc(id).update({
+                    blocked: true,
+                    unblock_until: firebase.firestore.Timestamp.fromDate(until)
+                });
+            } catch (e) {
+                alert('Error: ' + e.message);
+            }
+        }
+
+        async function deleteSite(id) {
+            if (!confirm('¿Eliminar este sitio?')) return;
+            try {
+                await db.collection('blocked_sites').doc(id).delete();
+            } catch (e) {
+                alert('Error: ' + e.message);
+            }
+        }
+
+        // ===== DESCARGA DEL SCRIPT PYTHON =====
+        function downloadScript() {
+            // Contenido del script (se genera al momento)
+            const scriptContent = `import time
+from datetime import datetime
+import firebase_admin
+from firebase_admin import credentials, firestore
+import os
+import sys
+import ctypes
+
+# === CONFIGURACIÓN ===
+HOSTS_PATH = r"C:\\Windows\\System32\\drivers\\etc\\hosts"
+REDIRECT = "127.0.0.1"
+SERVICE_ACCOUNT = "serviceAccountKey.json"
+
+# === ELEVAR PRIVILEGIOS (Windows) ===
+def is_admin():
+    try:
+        return ctypes.windll.shell32.IsUserAnAdmin()
+    except:
+        return False
+
+if not is_admin():
+    # Reiniciar el script con permisos de administrador
+    ctypes.windll.shell32.ShellExecuteW(None, "runas", sys.executable, " ".join(sys.argv), None, 1)
+    sys.exit()
+
+# === INICIALIZAR FIREBASE ===
+if not firebase_admin._apps:
+    if not os.path.exists(SERVICE_ACCOUNT):
+        print(f"ERROR: No se encuentra el archivo '{SERVICE_ACCOUNT}'. Coloca la clave de servicio en la misma carpeta.")
+        input("Presiona Enter para salir...")
+        sys.exit(1)
+    cred = credentials.Certificate(SERVICE_ACCOUNT)
+    firebase_admin.initialize_app(cred)
+db = firestore.client()
+
+def get_blocked_sites():
+    sites_ref = db.collection('blocked_sites')
+    docs = sites_ref.stream()
+    blocked = []
+    now = datetime.now()
+    for doc in docs:
+        data = doc.to_dict()
+        url = data.get('url')
+        if not url:
+            continue
+        unblock_until = data.get('unblock_until')
+        if unblock_until and isinstance(unblock_until, datetime) and unblock_until > now:
+            continue
+        if not data.get('blocked', True):
+            continue
+        blocked.append(url)
+    return blocked
+
+def update_hosts(blocked_urls):
+    try:
+        with open(HOSTS_PATH, 'r', encoding='utf-8') as file:
+            lines = file.readlines()
+    except PermissionError:
+        print("ERROR: No se puede leer el archivo hosts. Ejecuta como administrador.")
+        return
+
+    new_lines = []
+    # Marcar líneas que añadimos (con comentario especial)
+    for line in lines:
+        # Si la línea contiene alguna URL de las que vamos a bloquear, la omitimos
+        if any(url in line for url in blocked_urls):
+            continue
+        # También eliminamos líneas que hayamos añadido anteriormente
+        if "# bloqueado_por_script" in line:
+            continue
+        new_lines.append(line)
+
+    for url in blocked_urls:
+        new_lines.append(f"{REDIRECT} {url} # bloqueado_por_script\\n")
+
+    try:
+        with open(HOSTS_PATH, 'w', encoding='utf-8') as file:
+            file.writelines(new_lines)
+        print(f"Hosts actualizado. Bloqueados: {blocked_urls}")
+    except PermissionError:
+        print("ERROR: No se puede escribir en hosts. Ejecuta como administrador.")
+
+def main():
+    print("=== Control Parental iniciado ===")
+    print("Monitoreando cambios en Firestore...")
+    while True:
+        try:
+            blocked = get_blocked_sites()
+            update_hosts(blocked)
+        except Exception as e:
+            print(f"Error en ciclo: {e}")
+        time.sleep(10)
+
+if __name__ == "__main__":
+    main()
+`;
+
+            // Crear un blob y descargar
+            const blob = new Blob([scriptContent], { type: 'text/x-python' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'parental_control.py';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+        }
+
+        // Iniciar renderizado
+        renderSites();
     </script>
 </body>
-</html>
-
+</html>b
