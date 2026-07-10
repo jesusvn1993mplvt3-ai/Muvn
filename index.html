@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Control Parental INVISIBLE - MUVN</title>
+    <title>Control Parental AUTO - MUVN</title>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
     <style>
@@ -18,13 +18,13 @@
         .btn-time { background: #3498db; color: white; }
         .btn-special { background: #8e44ad; color: white; }
         input { padding: 10px; border: 1px solid #ddd; border-radius: 6px; width: 60%; }
-        .instructions { background: #e3f2fd; padding: 15px; border-radius: 8px; border-left: 5px solid #2196f3; margin-top: 15px; }
+        .instructions { background: #fff3e0; padding: 15px; border-radius: 8px; border-left: 5px solid #ff9800; margin-top: 15px; }
         .file-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin: 15px 0; }
         .file-item { background: #fff; padding: 15px; border-radius: 8px; text-align: center; border: 1px solid #ddd; }
     </style>
 </head>
 <body>
-    <h1>👻 Control Parental MUVN v5 (Invisibilidad Total)</h1>
+    <h1>🤖 Control Parental MUVN v6 (Auto-Configurable)</h1>
     
     <div class="card">
         <h2>➕ Gestión de Sitios</h2>
@@ -37,28 +37,28 @@
     </div>
 
     <div class="card">
-        <h2>⬇️ Archivos de Activación Fantasma</h2>
-        <p>Con estos archivos, el sistema se activa sin mostrar ninguna ventana en la pantalla.</p>
+        <h2>⬇️ Archivos de Configuración Automática</h2>
+        <p>Usa estos archivos para que el sistema se configure solo y arranque siempre con la PC.</p>
         <div class="file-grid">
             <div class="file-item">
-                <strong>🐍 Motor Principal</strong><br><br>
+                <strong>🐍 Motor</strong><br><br>
                 <button onclick="downloadScript()" class="btn-time">parental_control.py</button>
             </div>
-            <div class="file-item" style="background: #f3e5f5; border-color: #e1bee7;">
-                <strong>👻 Lanzador Fantasma</strong><br><br>
+            <div class="file-item">
+                <strong>👻 Lanzador</strong><br><br>
                 <button onclick="downloadVbs()" class="btn-special">activar_silencioso.vbs</button>
             </div>
-            <div class="file-item">
-                <strong>⚙️ Preparador</strong><br><br>
-                <button onclick="downloadBat()" class="btn-add">preparar_sistema.bat</button>
+            <div class="file-item" style="background: #fff3e0; border-color: #ffcc80;">
+                <strong>⚡ Auto-Programador</strong><br><br>
+                <button onclick="downloadAutoTask()" class="btn-special" style="background: #e67e22;">programar_inicio.bat</button>
             </div>
         </div>
         <div class="instructions">
-            <strong>👻 Instrucciones para Invisibilidad Total:</strong>
+            <strong>🚀 Cómo activar el Inicio Automático:</strong>
             <ol>
-                <li>Descarga los 3 archivos y ponlos en una carpeta con tu clave <code>serviceAccountKey.json</code>.</li>
-                <li>Ejecuta <strong>preparar_sistema.bat</strong> una sola vez (como admin) para instalar las librerías.</li>
-                <li>Para activar el bloqueo sin que se vea NADA, usa <strong>activar_silencioso.vbs</strong>. No abrirá ninguna ventana.</li>
+                <li>Descarga los 3 archivos en la misma carpeta.</li>
+                <li>Ejecuta <strong>programar_inicio.bat</strong> como administrador.</li>
+                <li>¡Listo! El sistema creará la tarea en Windows para que el control se active solo al encender la PC, sin ventanas y de forma invisible.</li>
             </ol>
         </div>
     </div>
@@ -171,14 +171,37 @@ Set WshShell = Nothing`;
             downloadFile(content, 'activar_silencioso.vbs', 'text/plain');
         }
 
-        function downloadBat() {
+        function downloadAutoTask() {
             const content = `@echo off
 cd /d "%~dp0"
-echo Instalando dependencias...
+set "TASK_NAME=MUVN_Control"
+set "SCRIPT_PATH=%~dp0activar_silencioso.vbs"
+
+echo ==========================================
+echo  PROGRAMADOR AUTOMATICO MUVN
+echo ==========================================
+echo.
+
+:: Verificar administrador
+net session >nul 2>&1
+if %errorlevel% neq 0 (
+    echo ⚠️  EJECUTA ESTE ARCHIVO COMO ADMINISTRADOR.
+    pause & exit
+)
+
+echo 📦 Instalando dependencias...
 pip install firebase-admin --quiet
-echo Listo. Ahora usa activar_silencioso.vbs para iniciar sin ventanas.
-pause`;
-            downloadFile(content, 'preparar_sistema.bat', 'text/plain');
+
+echo ⚙️  Creando tarea programada...
+schtasks /create /f /tn "%TASK_NAME%" /tr "wscript.exe \\"%SCRIPT_PATH%\\"" /sc onlogon /rl highest
+
+echo.
+echo ✅ ¡LISTO! El control se activara solo al encender la PC.
+echo Iniciando ahora mismo de forma invisible...
+wscript.exe "%SCRIPT_PATH%"
+timeout /t 5
+exit`;
+            downloadFile(content, 'programar_inicio.bat', 'text/plain');
         }
 
         function downloadFile(c, f, m) {
