@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Control Parental PRO - MUVN</title>
+    <title>Control Parental NINJA - MUVN</title>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
     <style>
@@ -18,13 +18,13 @@
         .btn-time { background: #3498db; color: white; }
         .btn-special { background: #8e44ad; color: white; }
         input { padding: 10px; border: 1px solid #ddd; border-radius: 6px; width: 60%; }
-        .instructions { background: #fff9c4; padding: 15px; border-radius: 8px; border-left: 5px solid #fbc02d; margin-top: 15px; }
+        .instructions { background: #e8f5e9; padding: 15px; border-radius: 8px; border-left: 5px solid #4caf50; margin-top: 15px; }
         .file-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin: 15px 0; }
-        .file-item { background: #e3f2fd; padding: 15px; border-radius: 8px; text-align: center; border: 1px solid #bbdefb; }
+        .file-item { background: #fff; padding: 15px; border-radius: 8px; text-align: center; border: 1px solid #ddd; }
     </style>
 </head>
 <body>
-    <h1>🚀 Control Parental MUVN v3</h1>
+    <h1>🥷 Control Parental MUVN v4 (Modo Ninja)</h1>
     
     <div class="card">
         <h2>➕ Gestión de Sitios</h2>
@@ -37,23 +37,24 @@
     </div>
 
     <div class="card">
-        <h2>⬇️ Archivos para la Laptop</h2>
+        <h2>⬇️ Archivos Silenciosos</h2>
+        <p>Esta versión es totalmente invisible. No abre ventanas de terminal después de iniciar.</p>
         <div class="file-grid">
             <div class="file-item">
-                <strong>🐍 Motor Python</strong><br><br>
+                <strong>🐍 Motor Ninja</strong><br><br>
                 <button onclick="downloadScript()" class="btn-time">parental_control.py</button>
             </div>
-            <div class="file-item" style="background: #f3e5f5; border-color: #e1bee7;">
-                <strong>👦 Para tu Hermano</strong><br><br>
-                <button onclick="downloadBrotherBat()" class="btn-special">actualizar_acceso.bat</button>
+            <div class="file-item" style="background: #e8f5e9; border-color: #a5d6a7;">
+                <strong>🛡️ Instalador Único</strong><br><br>
+                <button onclick="downloadBrotherBat()" class="btn-add">instalar_y_correr.bat</button>
             </div>
         </div>
         <div class="instructions">
-            <strong>💡 Novedades de la v3:</strong>
+            <strong>🥷 Mejoras de la v4 (Ninja Mode):</strong>
             <ul>
-                <li><strong>Auto-Instalación:</strong> El .bat instala solo lo que falta (Python/Firebase).</li>
-                <li><strong>Ruta Inteligente:</strong> La primera vez pedirá la carpeta donde están los archivos y la recordará.</li>
-                <li><strong>Temporizador Real:</strong> Si das permiso por 5 min, la laptop desbloquea, espera el tiempo y <strong>bloquea de nuevo automáticamente</strong> sin que nadie toque nada.</li>
+                <li><strong>Cero Pantallazos:</strong> Se eliminaron todas las llamadas a terminal que causaban parpadeos.</li>
+                <li><strong>Totalmente Invisible:</strong> El script corre en segundo plano sin mostrar ventanas.</li>
+                <li><strong>Auto-Cierre:</strong> El instalador se cierra solo después de iniciar el servicio invisible.</li>
             </ul>
         </div>
     </div>
@@ -79,13 +80,11 @@
                     const id = doc.id;
                     const div = document.createElement('div');
                     div.className = 'site';
-                    
                     let status = data.blocked ? '🔴 Bloqueado' : '🟢 Libre';
                     const now = new Date();
                     if (data.unblock_until && data.unblock_until.toDate() > now) {
                         status = `⏳ Libre hasta ${data.unblock_until.toDate().toLocaleTimeString()}`;
                     }
-
                     div.innerHTML = `
                         <span class="url">${data.url}</span>
                         <span class="status">${status}</span>
@@ -107,15 +106,8 @@
         }
 
         async function preLoadBlocklist() {
-            const list = [
-                'tiktok.com', 'tiktokv.com', 'tiktokcdn.com', 'byteoversea.com', 'vasing.com', 'muscdn.com',
-                'chatroulette.com', 'omegle.com', 'tinychat.com', 'bazoocam.org', 'emeraldchat.com', 'shagle.com',
-                'tinder.com', 'badoo.com', 'bumble.com', 'happn.com', 'grindr.com', 'meetic.es', 'pof.com'
-            ];
-            if(confirm("¿Cargar lista de TikTok, Citas y Chatroulette?")) {
-                for(let url of list) await addSite(url);
-                alert("Lista cargada.");
-            }
+            const list = ['tiktok.com', 'tiktokv.com', 'tiktokcdn.com', 'byteoversea.com', 'chatroulette.com', 'omegle.com', 'tinder.com', 'badoo.com'];
+            if(confirm("¿Cargar lista?")) { for(let url of list) await addSite(url); alert("Cargada."); }
         }
 
         async function toggleBlock(id, val) { await db.collection('blocked_sites').doc(id).update({ blocked: val, unblock_until: null }); }
@@ -134,15 +126,10 @@ from firebase_admin import credentials, firestore
 HOSTS = r"C:\\Windows\\System32\\drivers\\etc\\hosts"
 CRED = "serviceAccountKey.json"
 
-if not ctypes.windll.shell32.IsUserAnAdmin():
-    ctypes.windll.shell32.ShellExecuteW(None, "runas", sys.executable, " ".join(sys.argv), None, 1)
-    sys.exit()
-
-if not firebase_admin._apps:
-    firebase_admin.initialize_app(credentials.Certificate(CRED))
-db = firestore.client()
-
 def sync():
+    if not firebase_admin._apps:
+        firebase_admin.initialize_app(credentials.Certificate(CRED))
+    db = firestore.client()
     docs = db.collection('blocked_sites').stream()
     blocked = []
     now = datetime.now()
@@ -161,57 +148,31 @@ def sync():
         new.append(f"127.0.0.1 www.{u} #muvn\\n")
     
     with open(HOSTS, 'w') as f: f.writelines(new)
-    subprocess.run(["ipconfig", "/flushdns"], capture_output=True)
-    print(f"[{datetime.now().strftime('%H:%M:%S')}] Sincronizado. Bloqueados: {len(blocked)}")
+    # Flush DNS silencioso (sin ventana)
+    subprocess.run(["ipconfig", "/flushdns"], creationflags=0x08000000)
 
 if __name__ == "__main__":
     while True:
         try: sync()
-        except Exception as e: print(f"Error: {e}")
-        time.sleep(15)
+        except: pass
+        time.sleep(20)
 `;
             downloadFile(content, 'parental_control.py', 'text/x-python');
         }
 
         function downloadBrotherBat() {
             const content = `@echo off
-title MUVN - Actualizar Acceso
-set "CONFIG_FILE=%APPDATA%\\muvn_config.txt"
-
-:: Verificar si ya tenemos la ruta guardada
-if exist "%CONFIG_FILE%" (
-    set /p APP_DIR=<"%CONFIG_FILE%"
-) else (
-    echo ==========================================
-    echo  BIENVENIDO AL CONTROL PARENTAL MUVN
-    echo ==========================================
-    echo.
-    echo Por favor, pega la ruta de la carpeta donde
-    echo guardaste el archivo parental_control.py
-    echo (Ejemplo: C:\\Users\\Nombre\\Desktop\\Control)
-    echo.
-    set /p APP_DIR="Ruta: "
-    echo %APP_DIR% > "%CONFIG_FILE%"
-)
-
-cd /d "%APP_DIR%"
-
-:: Verificar administrador
-net session >nul 2>&1
-if %errorlevel% neq 0 (
-    echo ⚠️  Ejecuta como ADMINISTRADOR para aplicar cambios.
-    pause & exit
-)
-
-echo 🔄 Sincronizando...
-python -c "import firebase_admin" 2>nul || pip install firebase-admin
-start /min pythonw parental_control.py
-echo.
-echo ✅ ¡Permisos actualizados!
-echo El script se quedara trabajando en segundo plano.
-echo Si el tiempo de permiso termina, se bloqueara solo.
-timeout /t 5`;
-            downloadFile(content, 'actualizar_acceso.bat', 'text/plain');
+cd /d "%~dp0"
+net session >nul 2>&1 || (echo Ejecuta como ADMIN & pause & exit)
+echo Instalando dependencias silenciosamente...
+pip install firebase-admin --quiet
+echo Iniciando servicio invisible...
+start "" /b pythonw parental_control.py
+echo ✅ Sistema iniciado en segundo plano.
+echo Esta ventana se cerrara en 3 segundos.
+timeout /t 3 >nul
+exit`;
+            downloadFile(content, 'instalar_y_correr.bat', 'text/plain');
         }
 
         function downloadFile(c, f, m) {
