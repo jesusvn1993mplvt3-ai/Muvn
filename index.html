@@ -11,9 +11,9 @@
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             padding: 20px;
-            max-width: 700px;
+            max-width: 800px;
             margin: auto;
-            background: #f5f7fa;
+            background: #f0f2f5;
         }
         h1, h2 { color: #1a1a2e; }
         .card {
@@ -49,6 +49,8 @@
         button.danger:hover { background: #c0392b; }
         button.success { background: #27ae60; }
         button.success:hover { background: #1e8449; }
+        button.info { background: #3498db; }
+        button.info:hover { background: #2980b9; }
         input {
             padding: 10px;
             width: 70%;
@@ -62,6 +64,7 @@
             padding: 12px 24px;
             font-size: 1.1em;
             margin-top: 10px;
+            margin-right: 10px;
         }
         .download-btn:hover { background: #2980b9; }
         .instructions {
@@ -80,6 +83,23 @@
             font-size: 0.8em;
             margin-left: 8px;
         }
+        .file-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin: 10px 0;
+        }
+        .file-item {
+            background: #eaf2f8;
+            border-radius: 8px;
+            padding: 10px 15px;
+            flex: 1 1 200px;
+            text-align: center;
+        }
+        .file-item button {
+            width: 100%;
+            margin-top: 5px;
+        }
     </style>
 </head>
 <body>
@@ -95,24 +115,37 @@
         <button onclick="addSite()" class="success">Agregar</button>
     </div>
 
-    <div class="card" style="background: #eaf2f8;">
-        <h2>⬇️ Descargar script para la laptop</h2>
-        <p>Este script se ejecutará en segundo plano y actualizará automáticamente el archivo <code>hosts</code> según lo que configures aquí.</p>
-        <button onclick="downloadScript()" class="download-btn">📥 Descargar parental_control.py</button>
+    <div class="card">
+        <h2>⬇️ Descargar archivos para la laptop</h2>
+        <p>Coloca todos los archivos en la <strong>misma carpeta</strong> y ejecuta <code>run_control.bat</code> como administrador.</p>
+        <div class="file-grid">
+            <div class="file-item">
+                <strong>🐍 Script Python</strong>
+                <button onclick="downloadScript()" class="info">Descargar parental_control.py</button>
+            </div>
+            <div class="file-item">
+                <strong>⚙️ Ejecutor</strong>
+                <button onclick="downloadBat()" class="success">Descargar run_control.bat</button>
+            </div>
+            <div class="file-item">
+                <strong>🧹 Flush DNS</strong>
+                <button onclick="downloadFlush()" class="danger">Descargar flush_dns.bat</button>
+            </div>
+        </div>
         <div class="instructions">
             <strong>📝 Instrucciones:</strong>
             <ol>
-                <li>Descarga el script y colócalo en una carpeta de la laptop.</li>
+                <li>Descarga los tres archivos y colócalos en una carpeta de la laptop.</li>
                 <li>Descarga la clave de servicio (Service Account JSON) desde <a href="https://console.firebase.google.com/project/muvn-72b44/settings/serviceaccounts/adminsdk" target="_blank">Firebase Console → Configuración → Cuentas de servicio</a>.</li>
-                <li>Renombra el archivo de clave como <code>serviceAccountKey.json</code> y ponlo en la <strong>misma carpeta</strong> que el script.</li>
-                <li>Ejecuta el script <strong>como administrador</strong> (clic derecho → Ejecutar como administrador) para que pueda modificar el archivo hosts.</li>
-                <li>¡Listo! Se actualizará cada 10 segundos.</li>
+                <li>Renombra la clave como <code>serviceAccountKey.json</code> y colócala en la <strong>misma carpeta</strong>.</li>
+                <li>Ejecuta <code>run_control.bat</code> <strong>como administrador</strong> (clic derecho → Ejecutar como administrador).</li>
+                <li>Si ves errores de permisos, revisa que el antivirus no esté bloqueando la escritura en hosts.</li>
             </ol>
         </div>
     </div>
 
     <script>
-        // ===== CONFIGURACIÓN DE FIREBASE (TÚ YA LA TIENES) =====
+        // ===== CONFIGURACIÓN DE FIREBASE =====
         const firebaseConfig = {
             apiKey: "AIzaSyBvQxckDVA4UivGKwQU2da2fBMolOH8UDw",
             authDomain: "muvn-72b44.firebaseapp.com",
@@ -126,12 +159,11 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        // ===== CREAR COLECCIÓN SI NO EXISTE (con un sitio de ejemplo) =====
+        // ===== CREAR COLECCIÓN SI NO EXISTE =====
         async function ensureCollection() {
             try {
                 const snapshot = await db.collection('blocked_sites').limit(1).get();
                 if (snapshot.empty) {
-                    // Agregar un documento de ejemplo
                     await db.collection('blocked_sites').add({
                         url: 'facebook.com',
                         blocked: true,
@@ -145,7 +177,7 @@
         }
         ensureCollection();
 
-        // ===== FUNCIONES DE RENDERIZADO Y MANIPULACIÓN =====
+        // ===== FUNCIONES DE RENDERIZADO =====
         function formatDate(ts) {
             if (!ts) return '';
             const d = ts.toDate();
@@ -258,23 +290,23 @@
             }
         }
 
-        // ===== DESCARGA DEL SCRIPT PYTHON =====
+        // ===== DESCARGA DE ARCHIVOS =====
         function downloadScript() {
-            // Contenido del script (se genera al momento)
-            const scriptContent = `import time
+            const content = `import time
 from datetime import datetime
 import firebase_admin
 from firebase_admin import credentials, firestore
 import os
 import sys
 import ctypes
+import subprocess
 
 # === CONFIGURACIÓN ===
 HOSTS_PATH = r"C:\\Windows\\System32\\drivers\\etc\\hosts"
 REDIRECT = "127.0.0.1"
 SERVICE_ACCOUNT = "serviceAccountKey.json"
 
-# === ELEVAR PRIVILEGIOS (Windows) ===
+# === ELEVAR PRIVILEGIOS ===
 def is_admin():
     try:
         return ctypes.windll.shell32.IsUserAnAdmin()
@@ -282,9 +314,17 @@ def is_admin():
         return False
 
 if not is_admin():
-    # Reiniciar el script con permisos de administrador
+    print("Reiniciando con permisos de administrador...")
     ctypes.windll.shell32.ShellExecuteW(None, "runas", sys.executable, " ".join(sys.argv), None, 1)
     sys.exit()
+
+# === LIMPIAR CACHÉ DNS ===
+def flush_dns():
+    try:
+        subprocess.run(["ipconfig", "/flushdns"], capture_output=True, check=True)
+        print("✅ Caché DNS limpiada.")
+    except Exception as e:
+        print(f"⚠️ No se pudo limpiar caché DNS: {e}")
 
 # === INICIALIZAR FIREBASE ===
 if not firebase_admin._apps:
@@ -319,11 +359,11 @@ def update_hosts(blocked_urls):
         with open(HOSTS_PATH, 'r', encoding='utf-8') as file:
             lines = file.readlines()
     except PermissionError:
-        print("ERROR: No se puede leer el archivo hosts. Ejecuta como administrador.")
+        print("❌ ERROR: No se puede leer el archivo hosts. Ejecuta como administrador.")
         return
 
+    # Filtrar líneas: conservar todas excepto las que tengan nuestras URLs o el comentario especial
     new_lines = []
-    # Marcar líneas que añadimos (con comentario especial)
     for line in lines:
         # Si la línea contiene alguna URL de las que vamos a bloquear, la omitimos
         if any(url in line for url in blocked_urls):
@@ -333,37 +373,124 @@ def update_hosts(blocked_urls):
             continue
         new_lines.append(line)
 
+    # Añadir nuevas líneas
     for url in blocked_urls:
         new_lines.append(f"{REDIRECT} {url} # bloqueado_por_script\\n")
 
     try:
         with open(HOSTS_PATH, 'w', encoding='utf-8') as file:
             file.writelines(new_lines)
-        print(f"Hosts actualizado. Bloqueados: {blocked_urls}")
+        print(f"✅ Hosts actualizado. Bloqueados: {blocked_urls}")
+        # Limpiar caché DNS para aplicar cambios inmediatamente
+        flush_dns()
     except PermissionError:
-        print("ERROR: No se puede escribir en hosts. Ejecuta como administrador.")
+        print("❌ ERROR: No se puede escribir en hosts. Ejecuta como administrador.")
 
 def main():
-    print("=== Control Parental iniciado ===")
-    print("Monitoreando cambios en Firestore...")
+    print("=== CONTROL PARENTAL INICIADO ===")
+    print("Monitoreando Firestore cada 10 segundos...")
+    print("Presiona Ctrl+C para detener.\\n")
     while True:
         try:
             blocked = get_blocked_sites()
             update_hosts(blocked)
         except Exception as e:
-            print(f"Error en ciclo: {e}")
+            print(f"❌ Error en ciclo: {e}")
         time.sleep(10)
 
 if __name__ == "__main__":
     main()
 `;
+            downloadFile(content, 'parental_control.py', 'text/x-python');
+        }
 
-            // Crear un blob y descargar
-            const blob = new Blob([scriptContent], { type: 'text/x-python' });
+        function downloadBat() {
+            const content = `@echo off
+title Control Parental - MUVN
+echo ==============================
+echo  Control Parental v2
+echo ==============================
+echo.
+
+:: Verificar si se ejecuta como administrador
+net session >nul 2>&1
+if %errorlevel% neq 0 (
+    echo ⚠️  Este script necesita permisos de administrador.
+    echo    Haz clic derecho y selecciona "Ejecutar como administrador".
+    pause
+    exit /b
+)
+
+:: Ir a la carpeta del script (por si se ejecuta desde otro lugar)
+cd /d "%~dp0"
+
+:: Verificar que existe el script Python
+if not exist "parental_control.py" (
+    echo ❌ No se encuentra parental_control.py en esta carpeta.
+    echo    Asegurate de tener todos los archivos en la misma carpeta.
+    pause
+    exit /b
+)
+
+:: Verificar que existe la clave de servicio
+if not exist "serviceAccountKey.json" (
+    echo ❌ No se encuentra serviceAccountKey.json.
+    echo    Descarga la clave desde Firebase Console y colócala aquí.
+    pause
+    exit /b
+)
+
+:: Limpiar caché DNS antes de iniciar
+echo 🔄 Limpiando caché DNS...
+ipconfig /flushdns >nul 2>&1
+echo ✅ Caché DNS limpiada.
+
+:: Ejecutar el script Python
+echo.
+echo 🚀 Iniciando script de control parental...
+echo    (Presiona Ctrl+C para detener)
+echo.
+python parental_control.py
+
+:: Si el script termina, pausar para ver errores
+pause
+`;
+            downloadFile(content, 'run_control.bat', 'text/plain');
+        }
+
+        function downloadFlush() {
+            const content = `@echo off
+title Flush DNS Cache
+echo ==============================
+echo  Limpiando caché DNS
+echo ==============================
+echo.
+
+:: Verificar permisos
+net session >nul 2>&1
+if %errorlevel% neq 0 (
+    echo ⚠️  Este script necesita permisos de administrador.
+    echo    Haz clic derecho y selecciona "Ejecutar como administrador".
+    pause
+    exit /b
+)
+
+:: Limpiar caché
+ipconfig /flushdns
+echo.
+echo ✅ Caché DNS limpiada.
+echo    Reinicia tu navegador para aplicar los cambios.
+pause
+`;
+            downloadFile(content, 'flush_dns.bat', 'text/plain');
+        }
+
+        function downloadFile(content, filename, mimeType) {
+            const blob = new Blob([content], { type: mimeType });
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = 'parental_control.py';
+            a.download = filename;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
@@ -374,4 +501,4 @@ if __name__ == "__main__":
         renderSites();
     </script>
 </body>
-</html>b
+</html>
