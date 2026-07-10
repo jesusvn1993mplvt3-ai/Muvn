@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Control Parental NINJA - MUVN</title>
+    <title>Control Parental INVISIBLE - MUVN</title>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
     <style>
@@ -18,44 +18,48 @@
         .btn-time { background: #3498db; color: white; }
         .btn-special { background: #8e44ad; color: white; }
         input { padding: 10px; border: 1px solid #ddd; border-radius: 6px; width: 60%; }
-        .instructions { background: #e8f5e9; padding: 15px; border-radius: 8px; border-left: 5px solid #4caf50; margin-top: 15px; }
+        .instructions { background: #e3f2fd; padding: 15px; border-radius: 8px; border-left: 5px solid #2196f3; margin-top: 15px; }
         .file-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin: 15px 0; }
         .file-item { background: #fff; padding: 15px; border-radius: 8px; text-align: center; border: 1px solid #ddd; }
     </style>
 </head>
 <body>
-    <h1>🥷 Control Parental MUVN v4 (Modo Ninja)</h1>
+    <h1>👻 Control Parental MUVN v5 (Invisibilidad Total)</h1>
     
     <div class="card">
         <h2>➕ Gestión de Sitios</h2>
         <div style="display:flex; gap:10px; margin-bottom:20px;">
             <input id="newUrl" placeholder="ej. tiktok.com" />
             <button onclick="addSite()" class="btn-add">Agregar Sitio</button>
-            <button onclick="preLoadBlocklist()" class="btn-special">Cargar Lista TikTok/Citas</button>
+            <button onclick="preLoadBlocklist()" class="btn-special">Cargar Lista Completa</button>
         </div>
         <div id="sites-list"></div>
     </div>
 
     <div class="card">
-        <h2>⬇️ Archivos Silenciosos</h2>
-        <p>Esta versión es totalmente invisible. No abre ventanas de terminal después de iniciar.</p>
+        <h2>⬇️ Archivos de Activación Fantasma</h2>
+        <p>Con estos archivos, el sistema se activa sin mostrar ninguna ventana en la pantalla.</p>
         <div class="file-grid">
             <div class="file-item">
-                <strong>🐍 Motor Ninja</strong><br><br>
+                <strong>🐍 Motor Principal</strong><br><br>
                 <button onclick="downloadScript()" class="btn-time">parental_control.py</button>
             </div>
-            <div class="file-item" style="background: #e8f5e9; border-color: #a5d6a7;">
-                <strong>🛡️ Instalador Único</strong><br><br>
-                <button onclick="downloadBrotherBat()" class="btn-add">instalar_y_correr.bat</button>
+            <div class="file-item" style="background: #f3e5f5; border-color: #e1bee7;">
+                <strong>👻 Lanzador Fantasma</strong><br><br>
+                <button onclick="downloadVbs()" class="btn-special">activar_silencioso.vbs</button>
+            </div>
+            <div class="file-item">
+                <strong>⚙️ Preparador</strong><br><br>
+                <button onclick="downloadBat()" class="btn-add">preparar_sistema.bat</button>
             </div>
         </div>
         <div class="instructions">
-            <strong>🥷 Mejoras de la v4 (Ninja Mode):</strong>
-            <ul>
-                <li><strong>Cero Pantallazos:</strong> Se eliminaron todas las llamadas a terminal que causaban parpadeos.</li>
-                <li><strong>Totalmente Invisible:</strong> El script corre en segundo plano sin mostrar ventanas.</li>
-                <li><strong>Auto-Cierre:</strong> El instalador se cierra solo después de iniciar el servicio invisible.</li>
-            </ul>
+            <strong>👻 Instrucciones para Invisibilidad Total:</strong>
+            <ol>
+                <li>Descarga los 3 archivos y ponlos en una carpeta con tu clave <code>serviceAccountKey.json</code>.</li>
+                <li>Ejecuta <strong>preparar_sistema.bat</strong> una sola vez (como admin) para instalar las librerías.</li>
+                <li>Para activar el bloqueo sin que se vea NADA, usa <strong>activar_silencioso.vbs</strong>. No abrirá ninguna ventana.</li>
+            </ol>
         </div>
     </div>
 
@@ -106,20 +110,9 @@
         }
 
         async function preLoadBlocklist() {
-            const list = [
-                // TikTok y derivados
-                'tiktok.com', 'tiktokv.com', 'tiktokcdn.com', 'byteoversea.com', 'vasing.com', 'muscdn.com', 'musical.ly',
-                // Chatroulette y clones
-                'chatroulette.com', 'omegle.com', 'tinychat.com', 'emeraldchat.com', 'shagle.com', 'chatspin.com', 'coomeet.com', 'camsurf.com', 'luckycrush.live', 'chathub.cam', 'chatrandom.com',
-                // Bazoocam y variantes
-                'bazoocam.org', 'bazoocam.com', 'bazoocam.es', 'bazoocam.net', 'bazoocam.info', 'bazoocam.live', 'bazoocam.me', 'bazoocam.online',
-                // Citas y otros
-                'tinder.com', 'badoo.com', 'bumble.com', 'happn.com', 'grindr.com', 'meetic.es', 'pof.com', 'ashleymadison.com', 'badoodate.com'
-            ];
-            if(confirm("¿Cargar lista extendida de TikTok, Citas y Videochat (Bazoocam/Chatroulette)?")) { 
-                for(let url of list) await addSite(url); 
-                alert("¡Lista extendida cargada con éxito!"); 
-            }
+            const list = ['tiktok.com', 'tiktokv.com', 'tiktokcdn.com', 'chatroulette.com', 'bazoocam.org', 'omegle.com', 'tinder.com'];
+            for(let url of list) await addSite(url);
+            alert("Lista cargada.");
         }
 
         async function toggleBlock(id, val) { await db.collection('blocked_sites').doc(id).update({ blocked: val, unblock_until: null }); }
@@ -160,7 +153,6 @@ def sync():
         new.append(f"127.0.0.1 www.{u} #muvn\\n")
     
     with open(HOSTS, 'w') as f: f.writelines(new)
-    # Flush DNS silencioso (sin ventana)
     subprocess.run(["ipconfig", "/flushdns"], creationflags=0x08000000)
 
 if __name__ == "__main__":
@@ -172,19 +164,21 @@ if __name__ == "__main__":
             downloadFile(content, 'parental_control.py', 'text/x-python');
         }
 
-        function downloadBrotherBat() {
+        function downloadVbs() {
+            const content = `Set WshShell = CreateObject("WScript.Shell")
+WshShell.Run "pythonw.exe parental_control.py", 0
+Set WshShell = Nothing`;
+            downloadFile(content, 'activar_silencioso.vbs', 'text/plain');
+        }
+
+        function downloadBat() {
             const content = `@echo off
 cd /d "%~dp0"
-net session >nul 2>&1 || (echo Ejecuta como ADMIN & pause & exit)
-echo Instalando dependencias silenciosamente...
+echo Instalando dependencias...
 pip install firebase-admin --quiet
-echo Iniciando servicio invisible...
-start "" /b pythonw parental_control.py
-echo ✅ Sistema iniciado en segundo plano.
-echo Esta ventana se cerrara en 3 segundos.
-timeout /t 3 >nul
-exit`;
-            downloadFile(content, 'instalar_y_correr.bat', 'text/plain');
+echo Listo. Ahora usa activar_silencioso.vbs para iniciar sin ventanas.
+pause`;
+            downloadFile(content, 'preparar_sistema.bat', 'text/plain');
         }
 
         function downloadFile(c, f, m) {
